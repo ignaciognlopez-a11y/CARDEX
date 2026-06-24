@@ -45,7 +45,7 @@
     /* WATCHLIST STRIP */
     .wl-strip { margin-bottom:28px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:12px 16px; }
     .wl-strip-label { font-size:10px; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); font-weight:600; margin-bottom:10px; }
-    .wl-carousel-wrap { overflow:hidden; height:130px; cursor:grab; user-select:none; }
+    .wl-carousel-wrap { overflow:hidden; height:130px; cursor:grab; user-select:none; -webkit-user-select:none; }
     .wl-carousel-wrap:active { cursor:grabbing; }
     .wl-carousel-inner { display:flex; gap:12px; will-change:transform; }
     .wl-img-slide { flex:0 0 auto; width:80px; display:flex; flex-direction:column; align-items:center; gap:4px; text-decoration:none; transition:opacity 0.15s; }
@@ -387,18 +387,23 @@
       requestAnimationFrame(tick);
     });
 
-    // Mouse
+    // Mouse - usar capture para interceptar antes que los links
     wrap.addEventListener('mousedown',e=>{
       dragging=true; dragX=e.clientX; dragPos=pos;
-      wrap.style.cursor='grabbing'; e.preventDefault();
-    });
+      wrap.style.cursor='grabbing';
+      inner.style.pointerEvents='none'; // bloquea links durante drag
+      e.preventDefault();
+    },{capture:true});
     window.addEventListener('mousemove',e=>{
       if(dragging) apply(dragPos+(e.clientX-dragX));
     });
     window.addEventListener('mouseup',()=>{
-      if(dragging){ dragging=false; prevT=null; wrap.style.cursor='grab'; }
+      if(dragging){
+        dragging=false; prevT=null; wrap.style.cursor='grab';
+        inner.style.pointerEvents=''; // restaura links
+      }
     });
-    // Cancelar click si fue drag
+    // Cancelar click si fue drag real
     wrap.addEventListener('click',e=>{
       if(Math.abs(pos-dragPos)>4) e.preventDefault();
     },{capture:true});
