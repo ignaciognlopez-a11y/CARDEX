@@ -986,6 +986,23 @@ window.portfolioData = {
         { date: "2026-06-26", price: 14.9 }
       ]
     }
+,
+
+    {
+      id: "WL-WORLDS-BOX",
+      name: "Worlds Bundle 2025",
+      set: "Origins",
+      condition: "Sealed",
+      status: "Watchlist",
+      qty: 1,
+      buyPrice: 0,
+      currentPrice: 221.06,
+      image: "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20300%20420%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg2%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23080808%22/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%230d0a0a%22/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22gold2%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23d4a843%22/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%238b6512%22/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Crect%20width%3D%22300%22%20height%3D%22420%22%20fill%3D%22url%28%23bg2%29%22/%3E%0A%20%20%3Crect%20x%3D%228%22%20y%3D%228%22%20width%3D%22284%22%20height%3D%22404%22%20rx%3D%2210%22%20fill%3D%22none%22%20stroke%3D%22url%28%23gold2%29%22%20stroke-width%3D%222%22/%3E%0A%20%20%3Crect%20x%3D%2216%22%20y%3D%2216%22%20width%3D%22268%22%20height%3D%22388%22%20rx%3D%228%22%20fill%3D%22none%22%20stroke%3D%22%23d4a843%22%20stroke-width%3D%220.5%22%20opacity%3D%220.3%22/%3E%0A%20%20%3Ccircle%20cx%3D%22150%22%20cy%3D%22160%22%20r%3D%2260%22%20fill%3D%22none%22%20stroke%3D%22%23d4a843%22%20stroke-width%3D%221%22%20opacity%3D%220.5%22/%3E%0A%20%20%3Ccircle%20cx%3D%22150%22%20cy%3D%22160%22%20r%3D%2245%22%20fill%3D%22%23d4a843%22%20opacity%3D%220.06%22/%3E%0A%20%20%3Ctext%20x%3D%22150%22%20y%3D%22155%22%20text-anchor%3D%22middle%22%20font-family%3D%22serif%22%20font-size%3D%2242%22%20fill%3D%22%23d4a843%22%20opacity%3D%220.8%22%3E%F0%9F%8C%8D%3C/text%3E%0A%20%20%3Ctext%20x%3D%22150%22%20y%3D%22195%22%20text-anchor%3D%22middle%22%20font-family%3D%22serif%22%20font-size%3D%2210%22%20fill%3D%22%23d4a843%22%20letter-spacing%3D%223%22%3EWORLDS%202025%3C/text%3E%0A%20%20%3Crect%20x%3D%2230%22%20y%3D%22300%22%20width%3D%22240%22%20height%3D%2260%22%20rx%3D%224%22%20fill%3D%22%23d4a843%22%20opacity%3D%220.07%22/%3E%0A%20%20%3Ctext%20x%3D%22150%22%20y%3D%22325%22%20text-anchor%3D%22middle%22%20font-family%3D%22serif%22%20font-size%3D%2214%22%20font-weight%3D%22bold%22%20fill%3D%22%23d4a843%22%3EWorlds%20Bundle%202025%3C/text%3E%0A%20%20%3Ctext%20x%3D%22150%22%20y%3D%22348%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%20font-size%3D%229%22%20fill%3D%22%23d4a843%22%20opacity%3D%220.5%22%20letter-spacing%3D%221%22%3ERIFTBOUND%20%C2%B7%20SEALED%3C/text%3E%0A%3C/svg%3E",
+      cardNumber: "Worlds Bundle",
+      cardmarketUrl: "https://www.cardmarket.com/en/Riftbound/Products/Box-Sets/Worlds-Bundle-2025?language=1&sortBy=price_asc&sellerCountry=1,2,3,33,35,5,6,8,9,11,12,7,14,15,37,16,17,36,21,18,19,20,22,23,24,25,26,27,29,31,30,10,28,4",
+      usSales: [],
+      priceHistory: [{ date: "2026-06-26", price: 221.06 }]
+    }
 
   ]
 };
