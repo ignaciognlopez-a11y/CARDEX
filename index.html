@@ -493,6 +493,8 @@
     if(!singles.length)document.getElementById('singles-section').style.display='none';
     if(!sealed.length)document.getElementById('sealed-section').style.display='none';
 
+    initWatchlist(allCards);
+
     // Filter buttons
     document.querySelectorAll('.filter-btn').forEach(btn=>{
       btn.addEventListener('click',()=>{
