@@ -11,7 +11,7 @@ const CM_FILTERS = '?language=1&minCondition=3&sellerCountry=3%2C4%2C5%2C6%2C7%2
 const CM = 'https://www.cardmarket.com';
 
 window.portfolioData = {
-  updatedAt: "2026-06-26",
+  updatedAt: "2026-06-29",
 
   cards: [
 
@@ -45,7 +45,7 @@ window.portfolioData = {
       status: "Holding",
       qty: 1,
       buyPrice: 0,
-      currentPrice: 62.95,
+      currentPrice: 62.5,
       image: "https://static.dotgg.gg/riftbound/cards/OGN-308.webp",
       cardNumber: "OGN-308",
       cardmarketUrl: CM + "/en/Riftbound/Products/Singles/Origins/Viktor-Herald-of-the-Arcane-V2-Overnumbered" + CM_FILTERS,
@@ -53,7 +53,8 @@ window.portfolioData = {
         { date: "2026-06-22", price: 70 },
         { date: "2026-06-23", price: 60 },
         { date: "2026-06-24", price: 60 },
-        { date: "2026-06-26", price: 62.95 }
+        { date: "2026-06-26", price: 62.95 },
+        { date: "2026-06-29", price: 62.5 }
       ]
     },
 
@@ -73,7 +74,8 @@ window.portfolioData = {
         { date: "2026-06-22", price: 58 },
         { date: "2026-06-23", price: 70 },
         { date: "2026-06-24", price: 70 },
-        { date: "2026-06-26", price: 60 }
+        { date: "2026-06-26", price: 60 },
+        { date: "2026-06-29", price: 60 }
       ]
     },
 
@@ -85,7 +87,7 @@ window.portfolioData = {
       status: "Holding",
       qty: 1,
       buyPrice: 37,
-      currentPrice: 30,
+      currentPrice: 29.95,
       image: "https://static.dotgg.gg/riftbound/cards/OGN-302.webp",
       cardNumber: "OGN-302",
       cardmarketUrl: CM + "/en/Riftbound/Products/Singles/Origins/Darius-Hand-of-Noxus-V2-Overnumbered" + CM_FILTERS,
@@ -93,7 +95,8 @@ window.portfolioData = {
         { date: "2026-06-22", price: 37 },
         { date: "2026-06-23", price: 29.95 },
         { date: "2026-06-24", price: 29.95 },
-        { date: "2026-06-26", price: 30 }
+        { date: "2026-06-26", price: 30 },
+        { date: "2026-06-29", price: 29.95 }
       ]
     },
 
@@ -105,7 +108,7 @@ window.portfolioData = {
       status: "Holding",
       qty: 1,
       buyPrice: 35,
-      currentPrice: 24.5,
+      currentPrice: 24.99,
       image: "https://static.dotgg.gg/riftbound/cards/OGN-151b.webp",
       cardNumber: "OGN-151b",
       cardmarketUrl: CM + "/en/Riftbound/Products/Singles/Origins-Promos/Lee-Sin-Centered" + CM_FILTERS,
@@ -113,7 +116,8 @@ window.portfolioData = {
         { date: "2026-06-22", price: 30 },
         { date: "2026-06-23", price: 24.99 },
         { date: "2026-06-24", price: 24.5 },
-        { date: "2026-06-26", price: 24.5 }
+        { date: "2026-06-26", price: 24.5 },
+        { date: "2026-06-29", price: 24.99 }
       ]
     },
 
@@ -155,7 +159,8 @@ window.portfolioData = {
         { date: "2026-06-22", price: 80 },
         { date: "2026-06-23", price: 70 },
         { date: "2026-06-24", price: 70 },
-        { date: "2026-06-26", price: 60 }
+        { date: "2026-06-26", price: 60 },
+        { date: "2026-06-29", price: 60 }
       ]
     },
 
@@ -175,7 +180,8 @@ window.portfolioData = {
         { date: "2026-06-22", price: 80 },
         { date: "2026-06-23", price: 70 },
         { date: "2026-06-24", price: 70 },
-        { date: "2026-06-26", price: 60 }
+        { date: "2026-06-26", price: 60 },
+        { date: "2026-06-29", price: 60 }
       ]
     },
 
@@ -187,13 +193,14 @@ window.portfolioData = {
       status: "Holding",
       qty: 1,
       buyPrice: 40,
-      currentPrice: 45,
+      currentPrice: 79.5,
       image: "https://static.dotgg.gg/riftbound/cards/UNL-220.webp",
       cardNumber: "UNL-220",
       cardmarketUrl: CM + "/en/Riftbound/Products/Singles/Unleashed/Pouty-Poro" + CM_FILTERS,
       priceHistory: [
         { date: "2026-06-22", price: 45 },
-        { date: "2026-06-23", price: 45 }
+        { date: "2026-06-23", price: 45 },
+        { date: "2026-06-29", price: 79.5 }
       ]
     },
 
@@ -205,7 +212,7 @@ window.portfolioData = {
       status: "Holding",
       qty: 1,
       buyPrice: 45,
-      currentPrice: 78,
+      currentPrice: 73.99,
       image: "https://static.dotgg.gg/riftbound/cards/UNL-222.webp",
       cardNumber: "UNL-222",
       cardmarketUrl: CM + "/en/Riftbound/Products/Singles/Unleashed/Plundering-Poro" + CM_FILTERS,
@@ -213,7 +220,8 @@ window.portfolioData = {
         { date: "2026-06-22", price: 54 },
         { date: "2026-06-23", price: 72 },
         { date: "2026-06-24", price: 72 },
-        { date: "2026-06-26", price: 78 }
+        { date: "2026-06-26", price: 78 },
+        { date: "2026-06-29", price: 73.99 }
       ]
     },
 
@@ -225,7 +233,7 @@ window.portfolioData = {
       status: "Holding",
       qty: 1,
       buyPrice: 27.99,
-      currentPrice: 73,
+      currentPrice: 57.21,
       image: "https://static.dotgg.gg/riftbound/cards/UNL-223.webp",
       cardNumber: "UNL-223",
       cardmarketUrl: CM + "/en/Riftbound/Products/Singles/Unleashed/Veteran-Poro" + CM_FILTERS,
@@ -233,7 +241,8 @@ window.portfolioData = {
         { date: "2026-06-22", price: 35 },
         { date: "2026-06-23", price: 70 },
         { date: "2026-06-24", price: 70 },
-        { date: "2026-06-26", price: 73 }
+        { date: "2026-06-26", price: 73 },
+        { date: "2026-06-29", price: 57.21 }
       ]
     },
 
@@ -245,7 +254,7 @@ window.portfolioData = {
       status: "Holding",
       qty: 1,
       buyPrice: 36.5,
-      currentPrice: 75,
+      currentPrice: 74.95,
       image: "https://static.dotgg.gg/riftbound/cards/UNL-225.webp",
       cardNumber: "UNL-225",
       cardmarketUrl: CM + "/en/Riftbound/Products/Singles/Unleashed/Daring-Poro" + CM_FILTERS,
@@ -253,7 +262,8 @@ window.portfolioData = {
         { date: "2026-06-22", price: 70 },
         { date: "2026-06-23", price: 70 },
         { date: "2026-06-24", price: 70 },
-        { date: "2026-06-26", price: 75 }
+        { date: "2026-06-26", price: 75 },
+        { date: "2026-06-29", price: 74.95 }
       ]
     },
 
@@ -273,7 +283,8 @@ window.portfolioData = {
         { date: "2026-06-22", price: 100 },
         { date: "2026-06-23", price: 89 },
         { date: "2026-06-24", price: 89.99 },
-        { date: "2026-06-26", price: 89.99 }
+        { date: "2026-06-26", price: 89.99 },
+        { date: "2026-06-29", price: 89.99 }
       ]
     },
 
@@ -293,7 +304,8 @@ window.portfolioData = {
         { date: "2026-06-22", price: 100 },
         { date: "2026-06-23", price: 89 },
         { date: "2026-06-24", price: 89.99 },
-        { date: "2026-06-26", price: 89.99 }
+        { date: "2026-06-26", price: 89.99 },
+        { date: "2026-06-29", price: 89.99 }
       ]
     },
 
@@ -333,7 +345,8 @@ window.portfolioData = {
         { date: "2026-06-22", price: 45 },
         { date: "2026-06-23", price: 55 },
         { date: "2026-06-24", price: 52 },
-        { date: "2026-06-26", price: 50 }
+        { date: "2026-06-26", price: 50 },
+        { date: "2026-06-29", price: 50 }
       ]
     },
 
@@ -367,7 +380,7 @@ window.portfolioData = {
       status: "Holding",
       qty: 1,
       buyPrice: 128,
-      currentPrice: 159.94,
+      currentPrice: 157,
       image: "https://cdn.sanity.io/images/dsfx7636/consumer_products_live/e026ee1a44bc86095f9afc5949c5fdb519b29c66-2560x2560.png",
       cardNumber: "OGN Box",
       cardmarketUrl: CM + "/en/Riftbound/Products/Booster-Boxes/Origins-Booster-Box?language=1&sortBy=price_asc&sellerCountry=1,2,3,33,35,5,6,8,9,11,12,7,14,15,37,16,17,36,21,18,19,20,22,23,24,25,26,27,29,31,30,10,28,4",
@@ -375,7 +388,8 @@ window.portfolioData = {
         { date: "2026-06-22", price: 150 },
         { date: "2026-06-23", price: 155.19 },
         { date: "2026-06-24", price: 161.89 },
-        { date: "2026-06-26", price: 159.94 }
+        { date: "2026-06-26", price: 159.94 },
+        { date: "2026-06-29", price: 157 }
       ]
     },
 
@@ -435,7 +449,8 @@ window.portfolioData = {
       usSales: [],
       priceHistory: [{ date: "2026-06-22", price: 89 },
         { date: "2026-06-24", price: 89.99 },
-        { date: "2026-06-26", price: 89.99 }
+        { date: "2026-06-26", price: 89.99 },
+        { date: "2026-06-29", price: 89.99 }
       ]
     },
 
@@ -454,7 +469,8 @@ window.portfolioData = {
       usSales: [],
       priceHistory: [{ date: "2026-06-22", price: 45 },
         { date: "2026-06-24", price: 70 },
-        { date: "2026-06-26", price: 60 }
+        { date: "2026-06-26", price: 60 },
+        { date: "2026-06-29", price: 60 }
       ]
     },
 
@@ -466,14 +482,15 @@ window.portfolioData = {
       status: "Watchlist",
       qty: 1,
       buyPrice: 0,
-      currentPrice: 75,
+      currentPrice: 74.95,
       image: "https://static.dotgg.gg/riftbound/cards/UNL-225.webp",
       cardNumber: "UNL-225",
       cardmarketUrl: "https://www.cardmarket.com/en/Riftbound/Products/Singles/Unleashed/Daring-Poro?language=1&minCondition=3&sortBy=price_asc",
       usSales: [],
       priceHistory: [{ date: "2026-06-22", price: 69 },
         { date: "2026-06-24", price: 70 },
-        { date: "2026-06-26", price: 75 }
+        { date: "2026-06-26", price: 75 },
+        { date: "2026-06-29", price: 74.95 }
       ]
     },
 
@@ -485,14 +502,15 @@ window.portfolioData = {
       status: "Watchlist",
       qty: 1,
       buyPrice: 0,
-      currentPrice: 73,
+      currentPrice: 57.21,
       image: "https://static.dotgg.gg/riftbound/cards/UNL-223.webp",
       cardNumber: "UNL-223",
       cardmarketUrl: "https://www.cardmarket.com/en/Riftbound/Products/Singles/Unleashed/Veteran-Poro?language=1&minCondition=3&sortBy=price_asc",
       usSales: [],
       priceHistory: [{ date: "2026-06-22", price: 66 },
         { date: "2026-06-24", price: 70 },
-        { date: "2026-06-26", price: 73 }
+        { date: "2026-06-26", price: 73 },
+        { date: "2026-06-29", price: 57.21 }
       ]
     },
 
@@ -504,14 +522,15 @@ window.portfolioData = {
       status: "Watchlist",
       qty: 1,
       buyPrice: 0,
-      currentPrice: 78,
+      currentPrice: 73.99,
       image: "https://static.dotgg.gg/riftbound/cards/UNL-222.webp",
       cardNumber: "UNL-222",
       cardmarketUrl: "https://www.cardmarket.com/en/Riftbound/Products/Singles/Unleashed/Plundering-Poro?language=1&minCondition=3&sortBy=price_asc",
       usSales: [],
       priceHistory: [{ date: "2026-06-22", price: 72 },
         { date: "2026-06-24", price: 72 },
-        { date: "2026-06-26", price: 78 }
+        { date: "2026-06-26", price: 78 },
+        { date: "2026-06-29", price: 73.99 }
       ]
     },
 
@@ -523,14 +542,15 @@ window.portfolioData = {
       status: "Watchlist",
       qty: 1,
       buyPrice: 0,
-      currentPrice: 80,
+      currentPrice: 79.5,
       image: "https://static.dotgg.gg/riftbound/cards/UNL-220.webp",
       cardNumber: "UNL-220",
       cardmarketUrl: "https://www.cardmarket.com/en/Riftbound/Products/Singles/Unleashed/Pouty-Poro?language=1&minCondition=3&sortBy=price_asc",
       usSales: [],
       priceHistory: [{ date: "2026-06-22", price: 75 },
         { date: "2026-06-24", price: 89.99 },
-        { date: "2026-06-26", price: 80 }
+        { date: "2026-06-26", price: 80 },
+        { date: "2026-06-29", price: 79.5 }
       ]
     },
 
@@ -561,14 +581,15 @@ window.portfolioData = {
       status: "Watchlist",
       qty: 1,
       buyPrice: 0,
-      currentPrice: 184,
+      currentPrice: 216.65,
       image: "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20300%20420%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%230d1117%22%2F%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%231a1206%22%2F%3E%0A%20%20%20%20%3C%2FlinearGradient%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22gold%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23c9a84c%22%2F%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%238b6914%22%2F%3E%0A%20%20%20%20%3C%2FlinearGradient%3E%0A%20%20%3C%2Fdefs%3E%0A%20%20%3Crect%20width%3D%22300%22%20height%3D%22420%22%20fill%3D%22url(%23bg)%22%2F%3E%0A%20%20%3Crect%20x%3D%228%22%20y%3D%228%22%20width%3D%22284%22%20height%3D%22404%22%20rx%3D%2210%22%20fill%3D%22none%22%20stroke%3D%22url(%23gold)%22%20stroke-width%3D%222%22%2F%3E%0A%20%20%3Crect%20x%3D%2216%22%20y%3D%2216%22%20width%3D%22268%22%20height%3D%22388%22%20rx%3D%228%22%20fill%3D%22none%22%20stroke%3D%22%23c9a84c%22%20stroke-width%3D%220.5%22%20opacity%3D%220.4%22%2F%3E%0A%20%20%3C!--%20Decorative%20corner%20elements%20--%3E%0A%20%20%3Cpath%20d%3D%22M8%2C40%20Q8%2C8%2040%2C8%22%20fill%3D%22none%22%20stroke%3D%22%23c9a84c%22%20stroke-width%3D%222%22%2F%3E%0A%20%20%3Cpath%20d%3D%22M260%2C8%20Q292%2C8%20292%2C40%22%20fill%3D%22none%22%20stroke%3D%22%23c9a84c%22%20stroke-width%3D%222%22%2F%3E%0A%20%20%3Cpath%20d%3D%22M8%2C380%20Q8%2C412%2040%2C412%22%20fill%3D%22none%22%20stroke%3D%22%23c9a84c%22%20stroke-width%3D%222%22%2F%3E%0A%20%20%3Cpath%20d%3D%22M260%2C412%20Q292%2C412%20292%2C380%22%20fill%3D%22none%22%20stroke%3D%22%23c9a84c%22%20stroke-width%3D%222%22%2F%3E%0A%20%20%3C!--%20Center%20emblem%20--%3E%0A%20%20%3Ccircle%20cx%3D%22150%22%20cy%3D%22175%22%20r%3D%2255%22%20fill%3D%22none%22%20stroke%3D%22%23c9a84c%22%20stroke-width%3D%221.5%22%20opacity%3D%220.6%22%2F%3E%0A%20%20%3Ccircle%20cx%3D%22150%22%20cy%3D%22175%22%20r%3D%2245%22%20fill%3D%22%23c9a84c%22%20opacity%3D%220.08%22%2F%3E%0A%20%20%3Ctext%20x%3D%22150%22%20y%3D%22168%22%20text-anchor%3D%22middle%22%20font-family%3D%22serif%22%20font-size%3D%2236%22%20fill%3D%22%23c9a84c%22%20opacity%3D%220.9%22%3E%E2%9A%9C%3C%2Ftext%3E%0A%20%20%3Ctext%20x%3D%22150%22%20y%3D%22200%22%20text-anchor%3D%22middle%22%20font-family%3D%22serif%22%20font-size%3D%2211%22%20fill%3D%22%23c9a84c%22%20letter-spacing%3D%223%22%3EARCANE%3C%2Ftext%3E%0A%20%20%3C!--%20Title%20area%20--%3E%0A%20%20%3Crect%20x%3D%2230%22%20y%3D%22300%22%20width%3D%22240%22%20height%3D%2260%22%20rx%3D%224%22%20fill%3D%22%23c9a84c%22%20opacity%3D%220.08%22%2F%3E%0A%20%20%3Ctext%20x%3D%22150%22%20y%3D%22325%22%20text-anchor%3D%22middle%22%20font-family%3D%22serif%22%20font-size%3D%2215%22%20font-weight%3D%22bold%22%20fill%3D%22%23c9a84c%22%3EArcane%20Box%20Set%3C%2Ftext%3E%0A%20%20%3Ctext%20x%3D%22150%22%20y%3D%22348%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%20font-size%3D%229%22%20fill%3D%22%23c9a84c%22%20opacity%3D%220.6%22%20letter-spacing%3D%221%22%3ERIFTBOUND%20%C2%B7%20LIMITED%20EDITION%3C%2Ftext%3E%0A%3C%2Fsvg%3E",
       cardNumber: "",
       cardmarketUrl: "https://www.cardmarket.com/en/Riftbound/Products/Box-Sets/Arcane-Box-Set?sortBy=price_asc",
       usSales: [],
       priceHistory: [{ date: "2026-06-22", price: 200 },
         { date: "2026-06-24", price: 179 },
-        { date: "2026-06-26", price: 184 }
+        { date: "2026-06-26", price: 184 },
+        { date: "2026-06-29", price: 216.65 }
       ]
     },
 
@@ -580,14 +601,15 @@ window.portfolioData = {
       status: "Watchlist",
       qty: 1,
       buyPrice: 0,
-      currentPrice: 2899,
+      currentPrice: 2900,
       image: "https://static.dotgg.gg/riftbound/cards/SFD-227.webp",
       cardNumber: "SFD-227*",
       cardmarketUrl: "https://www.cardmarket.com/en/Riftbound/Products/Singles/Spiritforged/Ahri-Inquisitive-V2-Signed-Showcase?language=1&minCondition=3&sortBy=price_asc",
       usSales: [],
       priceHistory: [{ date: "2026-06-22", price: 2800 },
         { date: "2026-06-24", price: 2899 },
-        { date: "2026-06-26", price: 2899 }
+        { date: "2026-06-26", price: 2899 },
+        { date: "2026-06-29", price: 2900 }
       ]
     },
 
@@ -618,14 +640,15 @@ window.portfolioData = {
       status: "Watchlist",
       qty: 1,
       buyPrice: 0,
-      currentPrice: 500,
+      currentPrice: 490,
       image: "https://static.dotgg.gg/riftbound/cards/OGN-310s.webp",
       cardNumber: "OGN-310*",
       cardmarketUrl: "https://www.cardmarket.com/en/Riftbound/Products/Singles/Origins/Sett-The-Boss-V3-Overnumbered?language=1&minCondition=3&sortBy=price_asc",
       usSales: [],
       priceHistory: [{ date: "2026-06-22", price: 550 },
         { date: "2026-06-24", price: 530 },
-        { date: "2026-06-26", price: 500 }
+        { date: "2026-06-26", price: 500 },
+        { date: "2026-06-29", price: 490 }
       ]
     },
 
@@ -637,14 +660,15 @@ window.portfolioData = {
       status: "Watchlist",
       qty: 1,
       buyPrice: 0,
-      currentPrice: 589.99,
+      currentPrice: 569.9,
       image: "https://static.dotgg.gg/riftbound/cards/OGN-305s.webp",
       cardNumber: "OGN-305*",
       cardmarketUrl: "https://www.cardmarket.com/en/Riftbound/Products/Singles/Origins/Yasuo-Unforgiven-V3-Overnumbered?language=1&minCondition=3&sortBy=price_asc",
       usSales: [],
       priceHistory: [{ date: "2026-06-22", price: 590 },
         { date: "2026-06-24", price: 589.99 },
-        { date: "2026-06-26", price: 589.99 }
+        { date: "2026-06-26", price: 589.99 },
+        { date: "2026-06-29", price: 569.9 }
       ]
     },
 
@@ -656,14 +680,15 @@ window.portfolioData = {
       status: "Watchlist",
       qty: 1,
       buyPrice: 0,
-      currentPrice: 500,
+      currentPrice: 449.99,
       image: "https://static.dotgg.gg/riftbound/cards/OGN-300s.webp",
       cardNumber: "OGN-300*",
       cardmarketUrl: "https://www.cardmarket.com/en/Riftbound/Products/Singles/Origins/Volibear-Relentless-Storm-V3-Overnumbered?language=1&minCondition=3&sortBy=price_asc",
       usSales: [],
       priceHistory: [{ date: "2026-06-22", price: 480 },
         { date: "2026-06-24", price: 490 },
-        { date: "2026-06-26", price: 500 }
+        { date: "2026-06-26", price: 500 },
+        { date: "2026-06-29", price: 449.99 }
       ]
     },
 
@@ -675,14 +700,15 @@ window.portfolioData = {
       status: "Watchlist",
       qty: 1,
       buyPrice: 0,
-      currentPrice: 585,
+      currentPrice: 570,
       image: "https://static.dotgg.gg/riftbound/cards/OGN-308s.webp",
       cardNumber: "OGN-308*",
       cardmarketUrl: "https://www.cardmarket.com/en/Riftbound/Products/Singles/Origins/Viktor-Herald-of-the-Arcane-V3-Overnumbered?language=1&minCondition=3&sortBy=price_asc",
       usSales: [],
       priceHistory: [{ date: "2026-06-22", price: 500 },
         { date: "2026-06-24", price: 500 },
-        { date: "2026-06-26", price: 585 }
+        { date: "2026-06-26", price: 585 },
+        { date: "2026-06-29", price: 570 }
       ]
     },
 
@@ -701,7 +727,8 @@ window.portfolioData = {
       usSales: [],
       priceHistory: [{ date: "2026-06-22", price: 1000 },
         { date: "2026-06-24", price: 950 },
-        { date: "2026-06-26", price: 950 }
+        { date: "2026-06-26", price: 950 },
+        { date: "2026-06-29", price: 950 }
       ]
     },
 
@@ -713,14 +740,15 @@ window.portfolioData = {
       status: "Watchlist",
       qty: 1,
       buyPrice: 0,
-      currentPrice: 700,
+      currentPrice: 766.77,
       image: "https://static.dotgg.gg/riftbound/cards/OGN-309s.webp",
       cardNumber: "OGN-309*",
       cardmarketUrl: "https://www.cardmarket.com/en/Riftbound/Products/Singles/Origins/Miss-Fortune-Bounty-Hunter-V3-Overnumbered?language=1&minCondition=3&sortBy=price_asc",
       usSales: [],
       priceHistory: [{ date: "2026-06-22", price: 767 },
         { date: "2026-06-24", price: 700 },
-        { date: "2026-06-26", price: 700 }
+        { date: "2026-06-26", price: 700 },
+        { date: "2026-06-29", price: 766.77 }
       ]
     },
 
@@ -739,7 +767,8 @@ window.portfolioData = {
       usSales: [],
       priceHistory: [{ date: "2026-06-22", price: 600 },
         { date: "2026-06-24", price: 600 },
-        { date: "2026-06-26", price: 600 }
+        { date: "2026-06-26", price: 600 },
+        { date: "2026-06-29", price: 600 }
       ]
     },
 
@@ -751,14 +780,15 @@ window.portfolioData = {
       status: "Watchlist",
       qty: 1,
       buyPrice: 0,
-      currentPrice: 335,
+      currentPrice: 350,
       image: "https://static.dotgg.gg/riftbound/cards/OGN-302s.webp",
       cardNumber: "OGN-302*",
       cardmarketUrl: "https://www.cardmarket.com/en/Riftbound/Products/Singles/Origins/Darius-Hand-of-Noxus-V3-Signed-Showcase?language=1&minCondition=3&sortBy=price_asc",
       usSales: [],
       priceHistory: [{ date: "2026-06-22", price: 350 },
         { date: "2026-06-24", price: 350 },
-        { date: "2026-06-26", price: 335 }
+        { date: "2026-06-26", price: 335 },
+        { date: "2026-06-29", price: 350 }
       ]
     },
 
@@ -770,14 +800,15 @@ window.portfolioData = {
       status: "Watchlist",
       qty: 1,
       buyPrice: 0,
-      currentPrice: 550,
+      currentPrice: 500,
       image: "https://static.dotgg.gg/riftbound/cards/OGN-306s.webp",
       cardNumber: "OGN-306*",
       cardmarketUrl: "https://www.cardmarket.com/en/Riftbound/Products/Singles/Origins/Leona-Radiant-Dawn-V3-Overnumbered?language=1&minCondition=3&sortBy=price_asc",
       usSales: [],
       priceHistory: [{ date: "2026-06-22", price: 475 },
         { date: "2026-06-24", price: 550 },
-        { date: "2026-06-26", price: 550 }
+        { date: "2026-06-26", price: 550 },
+        { date: "2026-06-29", price: 500 }
       ]
     },
 
@@ -795,7 +826,8 @@ window.portfolioData = {
       cardmarketUrl: "https://www.cardmarket.com/en/Riftbound/Products/Singles/Origins/KaiSa-Daughter-of-the-Void-V3-Overnumbered?language=1&minCondition=3&sortBy=price_asc",
       priceHistory: [{ date: "2026-06-22", price: 1848 },
         { date: "2026-06-24", price: 1847.9 },
-        { date: "2026-06-26", price: 1850 }
+        { date: "2026-06-26", price: 1850 },
+        { date: "2026-06-29", price: 1850 }
       ],
       usSales: []
     },
