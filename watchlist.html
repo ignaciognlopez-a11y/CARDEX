@@ -4,27 +4,28 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
-  <title>Riftbound — Watchlist</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <title>Cardex — Watchlist</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&family=Montserrat:wght@800&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      --bg: #0a0a0f;
-      --surface: #111118;
-      --surface2: #16161e;
-      --border: #1e1e2a;
-      --gold: #c9a84c;
-      --gold-dim: #6a5528;
-      --orange: #e8681a;
-      --text: #e8e8f0;
-      --text-muted: #5a5a70;
+      --bg: #000000;
+      --surface: #1c1c1c;
+      --surface2: #242424;
+      --border: #7a5f28;
+      --gold: #b8912e;
+      --gold-dim: #6b5218;
+      --orange: #b8912e;
+      --text: #f2f2f2;
+      --text-muted: #9a9a9a;
       --green: #3ddc84;
       --green-bg: rgba(61,220,132,0.10);
       --red: #ff5a5a;
       --red-bg: rgba(255,90,90,0.10);
       --radius: 10px;
+      --card-glow: 0 0 0 1px rgba(212,168,58,0.38), inset 0 1px 0 rgba(255,255,255,0.16), 0 3px 0 rgba(0,0,0,0.9), 0 10px 28px rgba(0,0,0,0.85), 0 28px 64px rgba(0,0,0,0.9), 0 0 90px rgba(212,168,58,0.18);
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; min-height: 100vh; padding-bottom: 60px; overflow-x: hidden; }
+    body { background: radial-gradient(ellipse 140% 100% at 50% 35%, #3a2e14 0%, #241c0c 18%, #150f07 38%, #0a0703 62%, #000000 100%) fixed; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; min-height: 100vh; padding-bottom: 60px; overflow-x: hidden; }
 
     /* ── PAGE TRANSITIONS ── */
     @keyframes slide-in-right  { from { opacity: 0; transform: translateX(48px); } to { opacity: 1; transform: translateX(0); } }
@@ -34,7 +35,7 @@
 
     /* ── HEADER ── */
     header { position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: var(--bg); border-bottom: 1px solid var(--border); padding: 14px 28px; display: flex; align-items: center; gap: 14px; }
-    .logo-text { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 800; letter-spacing: -0.4px; color: var(--orange); white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+    .logo-text { font-family:'Montserrat',sans-serif; font-weight:800; font-size:22px; letter-spacing:0.02em; background:linear-gradient(135deg,#e8c766,#b8912e 55%,#8a6d1a); -webkit-background-clip:text; background-clip:text; color:transparent; line-height:1; }
     nav { display: flex; gap: 4px; margin-left: 24px; }
     .nav-link { font-size: 13px; font-weight: 500; color: var(--text-muted); text-decoration: none; padding: 5px 12px; border-radius: 6px; transition: background 0.15s, color 0.15s; }
     .nav-link:hover { background: var(--surface2); color: var(--text); }
@@ -59,35 +60,30 @@
     .card-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      gap: 10px;
-      /* Scroll horizontal táctil */
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: thin;
-      scrollbar-color: var(--border) transparent;
-      padding-bottom: 6px;
+      column-gap: 4vw;
+      row-gap: 14px;
+      padding: 0 4vw;
     }
-    .card-grid::-webkit-scrollbar { height: 4px; }
-    .card-grid::-webkit-scrollbar-track { background: transparent; }
-    .card-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
     /* ── WATCHLIST CARD ── */
     .wl-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
+      background: linear-gradient(145deg,#262626 0%,#1a1a1a 50%,#0f0f0f 100%);
+      border: 1px solid rgba(184,145,46,0.35);
       border-radius: var(--radius);
-      overflow: hidden;
       cursor: pointer;
       display: flex;
       flex-direction: column;
-      transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
-      min-width: 160px;
+      transition: border-color 0.25s, box-shadow 0.3s;
+      position: relative;
+      box-shadow: var(--card-glow);
     }
-    .wl-card:hover { border-color: var(--gold-dim); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+    .wl-card:hover { border-color: rgba(184,145,46,0.65); }
+    .wl-card::after { content: ''; position: absolute; inset: -1px; border-radius: calc(var(--radius) + 1px); pointer-events: none; z-index: 10; transition: box-shadow 0.35s; }
+    .wl-card:hover::after { box-shadow: 0 0 28px 4px rgba(184,145,46,0.35), 0 0 60px 8px rgba(140,100,30,0.08), inset 0 0 16px rgba(184,145,46,0.16); }
 
-    .card-cover { width: 100%; aspect-ratio: 3 / 4; overflow: hidden; background: var(--surface2); position: relative; flex-shrink: 0; }
-    .card-cover img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; transition: transform 0.3s ease; }
-    .wl-card:hover .card-cover img { transform: scale(1.04); }
+    .card-cover { width: 100%; aspect-ratio: 5/7; overflow: hidden; border-radius: var(--radius) var(--radius) 0 0; background: #050505; position: relative; flex-shrink: 0; }
+    .card-cover img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .card-gloss { position: absolute; inset: 0; opacity: 0; pointer-events: none; z-index: 5; transition: opacity 0.3s; }
 
     .card-body { padding: 10px 11px 12px; display: flex; flex-direction: column; gap: 5px; }
     .card-name { font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; line-height: 1.3; color: var(--text); }
@@ -97,10 +93,10 @@
     .badge-origins      { background: rgba(80,120,255,0.9); color: #fff; }
     .badge-unleashed    { background: rgba(220,70,70,0.9);  color: #fff; }
     .badge-spiritforged { background: rgba(50,180,100,0.9); color: #fff; }
-    .badge-proving      { background: rgba(200,160,50,0.9); color: #000; }
+    .badge-proving      { background: rgba(212,166,53,0.9); color: #000; }
     .badge-sealed-tag   { background: rgba(80,200,255,0.9); color: #000; }
 
-    .price-pill { font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 800; color: #4fc3f7; letter-spacing: -0.3px; line-height: 1.15; display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .price-pill { font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 800; color: #d9b04a; letter-spacing: -0.3px; line-height: 1.15; display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
     .card-price-block { display: flex; flex-direction: column; gap: 4px; margin-top: 5px; }
     .card-price-row { display: flex; align-items: baseline; gap: 6px; }
     .card-price-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); font-weight: 600; min-width: 76px; flex-shrink: 0; }
@@ -120,52 +116,65 @@
     .cv-neu { color: var(--text-muted); }
 
     /* ── MODAL ── */
-    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); z-index: 100; align-items: center; justify-content: center; }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); backdrop-filter: blur(12px); z-index: 100; align-items: center; justify-content: center; }
     .modal-overlay.open { display: flex; animation: overlay-fade-in 0.2s ease both; }
     @keyframes overlay-fade-in { from { opacity: 0; } to { opacity: 1; } }
-    .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; width: 520px; max-width: 95vw; overflow: hidden; position: relative; box-shadow: 0 24px 64px rgba(0,0,0,0.6); max-height: 90vh; overflow-y: auto; animation: modal-pop-in 0.3s cubic-bezier(0.34,1.56,0.64,1) both; }
-    @keyframes modal-pop-in { from { opacity: 0; transform: scale(0.88) translateY(24px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-    .modal-img { width: 100%; height: 160px; background: var(--surface2); overflow: hidden; position: relative; }
-    .modal-img img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
-    .modal-img-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 40%, var(--surface) 100%); }
-    .modal-body { padding: 14px 22px 22px; }
-    .modal-badges { display: flex; gap: 5px; margin-bottom: 8px; }
-    .modal-name { font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.2; margin-bottom: 14px; }
-    .modal-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 16px; }
-    .modal-stat { display: flex; flex-direction: column; gap: 3px; }
-    .modal-stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
-    .modal-stat-value { font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 700; letter-spacing: -0.4px; }
+    .modal { background: linear-gradient(160deg,#1a1a1a 0%,#0a0a0a 50%,#000000 100%); border: 1px solid rgba(184,145,46,0.29); border-radius: 18px; width: 440px; max-width: 95vw; max-height: 92vh; overflow-y: auto; overflow-x: hidden; position: relative; box-shadow: 0 36px 90px rgba(0,0,0,0.98), 0 0 0 1px rgba(184,145,46,0.16), 0 0 80px rgba(184,145,46,0.16); animation: modal-pop-in 0.32s cubic-bezier(0.34,1.4,0.64,1) both; }
+    @keyframes modal-pop-in { from { opacity: 0; transform: scale(0.86) translateY(28px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    .modal-close-x { position: fixed; top: 16px; right: 16px; width: 30px; height: 30px; border-radius: 50%; background: rgba(10,10,10,0.9); border: 1px solid rgba(255,255,255,0.1); cursor: pointer; color: var(--text-muted); font-size: 13px; display: flex; align-items: center; justify-content: center; z-index: 10; transition: color 0.15s, border-color 0.15s; }
+    .modal-close-x:hover { color: var(--text); border-color: rgba(255,255,255,0.25); }
+
+    .modal-stage { display: flex; justify-content: center; align-items: center; padding: 32px 20px 20px; perspective: 900px; background: radial-gradient(ellipse at 50% 60%, rgba(216,180,100,0.11) 0%, transparent 70%); cursor: crosshair; flex-shrink: 0; }
+    .modal-card-3d { position: relative; width: 190px; border-radius: 11px; overflow: hidden; transform-style: preserve-3d; box-shadow: 0 24px 60px rgba(0,0,0,0.9), 0 8px 20px rgba(0,0,0,0.6), 0 0 40px rgba(216,180,100,0.27), 0 0 0 1px rgba(255,255,255,0.08); transition: box-shadow 0.3s; }
+    .modal-card-3d:hover { box-shadow: 0 28px 70px rgba(0,0,0,0.9), 0 10px 24px rgba(0,0,0,0.6), 0 0 55px rgba(216,180,100,0.42), 0 0 0 1px rgba(255,255,255,0.12); }
+    #modal-img { width: 100%; height: auto; display: block; }
+    .modal-card-gloss { position: absolute; inset: 0; opacity: 0; pointer-events: none; border-radius: 11px; transition: opacity 0.2s; }
+    .modal-card-shine { position: absolute; inset: 0; pointer-events: none; border-radius: 11px; background: linear-gradient(135deg,rgba(255,255,255,0.1) 0%,transparent 55%,rgba(216,180,100,0.09) 100%); mix-blend-mode: screen; }
+
+    .modal-body { padding: 4px 22px 24px; }
+    .modal-badges { display: flex; gap: 5px; margin-bottom: 6px; }
+    .modal-name { font-family: 'DM Sans', sans-serif; font-size: 17px; font-weight: 800; letter-spacing: -0.4px; line-height: 1.25; margin-bottom: 14px; }
+    .modal-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: rgba(184,145,46,0.19); border: 1px solid rgba(184,145,46,0.24); border-radius: 10px; overflow: hidden; margin-bottom: 16px; }
+    .modal-stat { display: flex; flex-direction: column; gap: 3px; padding: 12px 10px; background: rgba(10,10,10,0.85); }
+    .modal-stat-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-weight: 700; }
+    .modal-stat-value { font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 800; letter-spacing: -0.4px; }
     .modal-stat-value.pos { color: var(--green); }
     .modal-stat-value.neg { color: var(--red); }
     .modal-stat-value.neu { color: var(--text-muted); }
-    .modal-spark-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 6px; }
-    canvas#modal-spark { width: 100%; height: 56px; display: block; margin-bottom: 16px; }
-    .modal-spark-empty { width: 100%; height: 56px; border: 1px dashed var(--border); border-radius: 6px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
-    .modal-spark-empty span { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
-    .sales-section-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 8px; font-weight: 500; display: flex; align-items: center; gap: 8px; }
-    .sales-section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-    .sales-empty { border: 1px dashed var(--border); border-radius: 6px; padding: 16px; text-align: center; margin-bottom: 16px; }
+
+    .modal-chart-section { margin-bottom: 16px; }
+    .modal-spark-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 8px; }
+    .chart-wrap { position: relative; width: 100%; height: 88px; }
+    #modal-spark { width: 100%; height: 88px; display: block; cursor: crosshair; border-radius: 6px; }
+    .chart-tip { display: none; position: absolute; top: 6px; background: rgba(18,18,18,0.95); border: 1px solid rgba(184,145,46,0.4); border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 700; color: var(--text); pointer-events: none; white-space: nowrap; z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.6); }
+    .modal-spark-empty { width: 100%; height: 88px; border: 1px dashed rgba(184,145,46,0.24); border-radius: 6px; display: flex; align-items: center; justify-content: center; margin-bottom: 0; }
+    .modal-spark-empty span { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
+    .sales-section-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .sales-section-label::after { content: ''; flex: 1; height: 1px; background: rgba(184,145,46,0.24); }
+    .sales-empty { border: 1px dashed rgba(184,145,46,0.24); border-radius: 6px; padding: 16px; text-align: center; margin-bottom: 16px; }
     .sales-empty span { font-size: 11px; color: var(--text-muted); }
     .sales-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
-    .sale-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; }
+    .sale-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: rgba(10,10,10,0.85); border: 1px solid rgba(184,145,46,0.19); border-radius: 6px; }
     .sale-platform { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 2px 6px; border-radius: 3px; flex-shrink: 0; }
     .sale-platform.ebay { background: rgba(230,130,0,0.2); color: #e68200; }
     .sale-platform.tcg  { background: rgba(80,160,255,0.2); color: #50a0ff; }
     .sale-date  { font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
     .sale-price { font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); margin-left: auto; white-space: nowrap; }
-    .sale-link  { font-size: 11px; color: var(--gold); text-decoration: none; flex-shrink: 0; }
+    .sale-link  { font-size: 11px; color: #d9b04a; text-decoration: none; flex-shrink: 0; }
     .sale-link:hover { text-decoration: underline; }
+
     .modal-actions { display: flex; gap: 10px; }
-    .btn-cardmarket { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--gold); color: #000; font-weight: 700; font-size: 13px; padding: 11px 16px; border-radius: 8px; text-decoration: none; transition: opacity 0.15s; }
-    .btn-cardmarket:hover { opacity: 0.85; }
-    .btn-close { background: var(--surface2); border: 1px solid var(--border); color: var(--text-muted); font-size: 13px; font-weight: 600; padding: 11px 16px; border-radius: 8px; cursor: pointer; transition: border-color 0.15s; }
-    .btn-close:hover { border-color: var(--text-muted); }
-    .modal-close-x { position: absolute; top: 10px; right: 10px; width: 28px; height: 28px; border-radius: 50%; background: rgba(0,0,0,0.5); border: none; cursor: pointer; color: #fff; font-size: 14px; display: flex; align-items: center; justify-content: center; z-index: 1; }
+    .btn-cardmarket { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg,#b8912e,#8a6d1a); color: #000; font-weight: 800; font-size: 13px; padding: 11px 16px; border-radius: 9px; text-decoration: none; transition: opacity 0.15s, box-shadow 0.15s; box-shadow: 0 4px 14px rgba(216,180,100,0.45); }
+    .btn-cardmarket:hover { opacity: 0.9; box-shadow: 0 6px 20px rgba(216,180,100,0.68); }
+    .btn-close { background: rgba(10,10,10,0.85); border: 1px solid rgba(184,145,46,0.24); color: var(--text-muted); font-size: 13px; font-weight: 600; padding: 11px 18px; border-radius: 9px; cursor: pointer; transition: border-color 0.15s, color 0.15s; }
+    .btn-close:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+
 
     .filter-group { display:flex; gap:4px; margin-left:auto; order:3; }
     .filter-btn { font-size:11px; font-weight:600; padding:4px 10px; border-radius:6px; border:1px solid var(--border); background:transparent; color:var(--text-muted); cursor:pointer; transition:all 0.15s; white-space:nowrap; }
     .filter-btn:hover { color:var(--text); border-color:var(--text-muted); }
-    .filter-btn.active { background:#e8681a; border-color:#e8681a; color:#fff; }
+    .filter-btn.active { background:#b8912e; border-color:#b8912e; color:#fff; }
 
     /* ── VISTA TOGGLE ── */
     .view-toggle { display: flex; gap: 2px; }
@@ -181,9 +190,9 @@
       border-radius: 8px; padding: 8px 14px; cursor: pointer;
       transition: border-color 0.15s, background 0.15s;
     }
-    .list-row:hover { border-color: var(--gold-dim); background: var(--surface2); }
+    .list-row:hover { border-color: var(--gold); background: var(--surface2); box-shadow: 0 0 16px rgba(184,145,46,0.22); }
     .list-row.dragging { opacity: 0.4; }
-    .list-row.drag-over { border-color: #e8681a; }
+    .list-row.drag-over { border-color: #b8912e; }
     .list-rank { font-size: 11px; font-weight: 700; color: var(--text-muted); width: 20px; text-align: center; flex-shrink: 0; }
     .list-img { width: 36px; height: 36px; border-radius: 5px; object-fit: cover; object-position: top; flex-shrink: 0; }
     .list-name { font-size: 13px; font-weight: 700; color: var(--text); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -198,24 +207,24 @@
     .list-buy:hover { opacity: 0.85; }
 
     /* Drag & drop */
-    .wl-card { transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s, opacity 0.15s; }
+    .wl-card { transition: border-color 0.15s, box-shadow 0.15s, opacity 0.15s; }
     .wl-card.dragging { opacity: 0.4; transform: scale(0.97); box-shadow: none !important; }
-    .wl-card.drag-over { border-color: #e8681a; box-shadow: 0 0 0 2px rgba(232,104,26,0.3); }
+    .wl-card.drag-over { border-color: #b8912e; box-shadow: 0 0 0 2px rgba(184,145,46,0.3); }
     .drag-mode .wl-card { cursor: grab; }
     .drag-mode .wl-card:active { cursor: grabbing; }
     .drag-mode .list-row { cursor: grab; }
     .drag-mode .list-row:active { cursor: grabbing; }
     .drag-hint { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 5px; margin-left: 8px; opacity: 0; transition: opacity 0.2s; }
     .drag-hint.visible { opacity: 1; }
-    @media (max-width: 1100px) { .card-grid { grid-template-columns: repeat(4,1fr); } }
-    @media (max-width: 860px)  { .card-grid { grid-template-columns: repeat(3,1fr); } }
-    @media (max-width: 540px)  { .card-grid { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 1100px) { .card-grid { grid-template-columns: repeat(4,1fr); column-gap: 3.5vw; padding: 0 3.5vw; } }
+    @media (max-width: 860px)  { .card-grid { grid-template-columns: repeat(3,1fr); column-gap: 3vw; padding: 0 3vw; } }
+    @media (max-width: 540px)  { .card-grid { grid-template-columns: repeat(2,1fr); column-gap: 2.5vw; padding: 0 2.5vw; } }
   </style>
 </head>
 <body>
 
 <header>
-  <svg class="logo-svg" viewBox="0 0 120 32" xmlns="http://www.w3.org/2000/svg" style="height:28px;width:auto"><rect width="32" height="32" rx="5" fill="#0a0a0f"/><polyline points="4,25 10,19 16,21 22,11 26,7" fill="none" stroke="#3ddc84" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="23,5 26,7 24,10" fill="none" stroke="#3ddc84" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><text x="38" y="21" font-family="DM Sans,sans-serif" font-size="13" font-weight="800" fill="#e8681a" letter-spacing="-0.3">Riftbound</text><text x="38" y="30" font-family="DM Sans,sans-serif" font-size="8" font-weight="500" fill="#5a5a70" letter-spacing="0.5">STOCKS TRACKER</text></svg>
+  <span class="logo-text">CARDEX</span>
   <nav>
     <a class="nav-link" href="index.html">Portfolio</a>
     <a class="nav-link active" href="watchlist.html">Watchlist</a>
@@ -230,9 +239,12 @@
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal">
     <button class="modal-close-x" id="modal-close-x">✕</button>
-    <div class="modal-img">
-      <img id="modal-img" src="" alt=""/>
-      <div class="modal-img-overlay"></div>
+    <div class="modal-stage" id="modal-stage">
+      <div class="modal-card-3d" id="modal-card-3d">
+        <img id="modal-img" src="" alt=""/>
+        <div class="modal-card-gloss" id="modal-card-gloss"></div>
+        <div class="modal-card-shine"></div>
+      </div>
     </div>
     <div class="modal-body">
       <div class="modal-badges" id="modal-badges"></div>
@@ -255,9 +267,14 @@
           <span class="modal-stat-value" id="modal-var-30">—</span>
         </div>
       </div>
-      <div class="modal-spark-label">Price history</div>
-      <div class="modal-spark-empty" id="modal-spark-empty"><span>No data yet</span></div>
-      <canvas id="modal-spark" style="display:none"></canvas>
+      <div class="modal-chart-section">
+        <span class="modal-spark-label">Price history</span>
+        <div class="chart-wrap" id="chart-wrap" style="display:none">
+          <canvas id="modal-spark"></canvas>
+          <div class="chart-tip" id="chart-tip"></div>
+        </div>
+        <div class="modal-spark-empty" id="modal-spark-empty"><span>No data yet</span></div>
+      </div>
       <div class="sales-section-label">US Market — Recent Sales</div>
       <div id="modal-sales-content"></div>
       <div class="modal-actions">
@@ -306,34 +323,60 @@
     return { text: fmtPct(v.pct), cls: v.pct >= 0 ? 'pos' : 'neg' };
   }
 
-  function drawSpark(id, history, h) {
+  function drawSpark(id, history, h, interactive) {
     const canvas = document.getElementById(id);
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const dpr = window.devicePixelRatio || 1;
-    const W = canvas.offsetWidth * dpr;
-    const H = (h || canvas.offsetHeight) * dpr;
+    const ctx = canvas.getContext('2d'), dpr = window.devicePixelRatio || 1;
+    const W = canvas.offsetWidth * dpr, H = (h || canvas.offsetHeight) * dpr;
     canvas.width = W; canvas.height = H;
-    const prices = history.map(x => x.price);
+    const prices = history.map(x => x.price), dates = history.map(x => x.date);
     const mn = Math.min(...prices), mx = Math.max(...prices), rng = mx-mn || 1;
-    const pad = 4*dpr;
-    const xp = i => pad + (i/(prices.length-1))*(W-pad*2);
-    const yp = v => H-pad-((v-mn)/rng)*(H-pad*2);
-    const up = prices[prices.length-1] >= prices[0];
-    const col = up ? '#3ddc84' : '#ff5a5a';
-    const grad = ctx.createLinearGradient(0,0,0,H);
-    grad.addColorStop(0, up ? 'rgba(61,220,132,0.22)' : 'rgba(255,90,90,0.22)');
-    grad.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.beginPath();
-    prices.forEach((p,i)=>i===0?ctx.moveTo(xp(i),yp(p)):ctx.lineTo(xp(i),yp(p)));
-    ctx.lineTo(xp(prices.length-1),H); ctx.lineTo(xp(0),H); ctx.closePath();
-    ctx.fillStyle=grad; ctx.fill();
-    ctx.beginPath();
-    prices.forEach((p,i)=>i===0?ctx.moveTo(xp(i),yp(p)):ctx.lineTo(xp(i),yp(p)));
-    ctx.strokeStyle=col; ctx.lineWidth=1.5*dpr; ctx.lineJoin='round'; ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(xp(prices.length-1),yp(prices[prices.length-1]),2.5*dpr,0,Math.PI*2);
-    ctx.fillStyle=col; ctx.fill();
+    const pad = 6*dpr, xp = i => pad + (i/(prices.length-1))*(W-pad*2), yp = v => H-pad-((v-mn)/rng)*(H-pad*2);
+    const up = prices[prices.length-1] >= prices[0], col = up ? '#3ddc84' : '#ff5a5a';
+
+    function render(hlIdx) {
+      ctx.clearRect(0,0,W,H);
+      const grad = ctx.createLinearGradient(0,0,0,H);
+      grad.addColorStop(0, up ? 'rgba(61,220,132,0.25)' : 'rgba(255,90,90,0.25)'); grad.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.beginPath(); prices.forEach((p,i)=>i===0?ctx.moveTo(xp(i),yp(p)):ctx.lineTo(xp(i),yp(p)));
+      ctx.lineTo(xp(prices.length-1),H); ctx.lineTo(xp(0),H); ctx.closePath(); ctx.fillStyle=grad; ctx.fill();
+      ctx.beginPath(); prices.forEach((p,i)=>i===0?ctx.moveTo(xp(i),yp(p)):ctx.lineTo(xp(i),yp(p)));
+      ctx.strokeStyle=col; ctx.lineWidth=2*dpr; ctx.lineJoin='round'; ctx.lineCap='round'; ctx.stroke();
+      ctx.beginPath(); ctx.arc(xp(prices.length-1),yp(prices[prices.length-1]),3*dpr,0,Math.PI*2); ctx.fillStyle=col; ctx.fill();
+
+      if (hlIdx !== undefined) {
+        const hx=xp(hlIdx), hy=yp(prices[hlIdx]);
+        ctx.save(); ctx.beginPath(); ctx.moveTo(hx,0); ctx.lineTo(hx,H);
+        ctx.strokeStyle='rgba(255,255,255,0.18)'; ctx.lineWidth=1*dpr; ctx.setLineDash([4*dpr,4*dpr]); ctx.stroke(); ctx.restore();
+        ctx.beginPath(); ctx.arc(hx,hy,6*dpr,0,Math.PI*2); ctx.fillStyle='rgba(255,255,255,0.18)'; ctx.fill();
+        ctx.beginPath(); ctx.arc(hx,hy,3.5*dpr,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.fill();
+        ctx.beginPath(); ctx.arc(hx,hy,2.2*dpr,0,Math.PI*2); ctx.fillStyle=col; ctx.fill();
+      }
+    }
+    render();
+
+    if (interactive && prices.length > 1) {
+      const tip = document.getElementById('chart-tip');
+      if (canvas._mv) canvas.removeEventListener('mousemove', canvas._mv);
+      if (canvas._ml) canvas.removeEventListener('mouseleave', canvas._ml);
+      canvas._mv = e => {
+        const r = canvas.getBoundingClientRect(), rx = (e.clientX-r.left)*dpr;
+        let best=0, bd=Infinity; prices.forEach((_,i)=>{ const d=Math.abs(xp(i)-rx); if(d<bd){bd=d;best=i;} });
+        render(best);
+        if (tip) {
+          const pf = prices[best].toLocaleString('de-DE',{minimumFractionDigits:0,maximumFractionDigits:0})+' €';
+          const df = new Date(dates[best]+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+          tip.textContent = df+'  ·  '+pf;
+          tip.style.display = 'block';
+          const relX = e.clientX-r.left, cw = r.width;
+          if (relX > cw/2) { tip.style.right=(cw-relX+10)+'px'; tip.style.left='auto'; }
+          else { tip.style.left=(relX+10)+'px'; tip.style.right='auto'; }
+        }
+      };
+      canvas._ml = () => { render(); if (tip) tip.style.display='none'; };
+      canvas.addEventListener('mousemove', canvas._mv);
+      canvas.addEventListener('mouseleave', canvas._ml);
+    }
   }
 
   function buildSalesHTML(sales) {
@@ -370,22 +413,65 @@
       el.textContent = text; el.className = 'modal-stat-value ' + cls;
     });
 
-    const sc = document.getElementById('modal-spark');
+    const cw = document.getElementById('chart-wrap');
     const se = document.getElementById('modal-spark-empty');
     if (item.priceHistory?.length > 1) {
-      sc.style.display = 'block'; se.style.display = 'none';
-      requestAnimationFrame(() => drawSpark('modal-spark', item.priceHistory, 56));
-    } else { sc.style.display='none'; se.style.display='flex'; }
+      cw.style.display = 'block'; se.style.display = 'none';
+      requestAnimationFrame(() => drawSpark('modal-spark', item.priceHistory, 88, true));
+    } else { cw.style.display='none'; se.style.display='flex'; }
 
     document.getElementById('modal-sales-content').innerHTML = buildSalesHTML(item.usSales);
     document.getElementById('modal-cm-link').href = cmUrl(item);
     document.getElementById('modal-overlay').classList.add('open');
     document.body.style.overflow = 'hidden';
+    initModalTilt();
+  }
+
+  function initModalTilt() {
+    const stage = document.getElementById('modal-stage');
+    const card3d = document.getElementById('modal-card-3d');
+    const gloss = document.getElementById('modal-card-gloss');
+    if (!stage || !card3d) return;
+    let tx=0, ty=0, tgtX=0, tgtY=0, gx=50, gy=50, hov=false;
+    function onMove(e) {
+      hov = true;
+      const r = card3d.getBoundingClientRect();
+      const mx = (e.clientX-r.left-r.width/2)/(r.width/2);
+      const my = (e.clientY-r.top-r.height/2)/(r.height/2);
+      tgtX = -my*14; tgtY = mx*14;
+      gx = ((e.clientX-r.left)/r.width)*100;
+      gy = ((e.clientY-r.top)/r.height)*100;
+      if (gloss) gloss.style.opacity = '1';
+    }
+    function onLeave() { hov=false; tgtX=0; tgtY=0; if (gloss) gloss.style.opacity='0'; }
+    stage.addEventListener('mousemove', onMove);
+    stage.addEventListener('mouseleave', onLeave);
+    let raf;
+    function tick() {
+      tx += (tgtX-tx)*0.1; ty += (tgtY-ty)*0.1;
+      if (Math.abs(tx)>0.01 || Math.abs(ty)>0.01 || hov) {
+        card3d.style.transform = `perspective(900px) rotateX(${tx.toFixed(2)}deg) rotateY(${ty.toFixed(2)}deg)`;
+      }
+      if (gloss && hov) {
+        gloss.style.background = `radial-gradient(circle at ${gx.toFixed(0)}% ${gy.toFixed(0)}%,rgba(255,255,200,0.28) 0%,rgba(255,255,255,0.07) 40%,transparent 65%)`;
+      }
+      raf = requestAnimationFrame(tick);
+    }
+    raf = requestAnimationFrame(tick);
+    const ov = document.getElementById('modal-overlay');
+    ov._stopTilt = () => {
+      stage.removeEventListener('mousemove', onMove);
+      stage.removeEventListener('mouseleave', onLeave);
+      cancelAnimationFrame(raf);
+      if (card3d) card3d.style.transform = '';
+    };
   }
 
   function closeModal() {
-    document.getElementById('modal-overlay').classList.remove('open');
+    const ov = document.getElementById('modal-overlay');
+    ov.classList.remove('open');
     document.body.style.overflow = '';
+    if (ov._stopTilt) { ov._stopTilt(); ov._stopTilt = null; }
   }
   document.getElementById('modal-close-x').addEventListener('click', closeModal);
   document.getElementById('modal-close-btn').addEventListener('click', closeModal);
@@ -416,6 +502,7 @@
     <div class="wl-card" data-id="${item.id}">
       <div class="card-cover">
         <img src="${imgSrc}" alt="${item.name}" loading="lazy" onerror="this.src='${FALLBACK_IMG}'"/>
+        <div class="card-gloss"></div>
       </div>
       <div class="card-body">
         <div class="card-badge-row">
@@ -553,6 +640,7 @@
           el.addEventListener('click', function(){ if(el.classList.contains('dragging'))return; var item=cards.find(function(c){return c.id===el.dataset.id;}); if(item)openModal(item); });
         });
         if (isDrag) addDragGrid(grid);
+        initWLCardEffects(grid);
       }
     }
 
@@ -592,6 +680,75 @@
         renderWLGrid(wl, currentSort, currentView);
       });
     });
+  }
+
+  // ── FLOATING + PARALLAX + 3D TILT + GLOSS (watchlist cards, igual que portfolio) ──
+  let wlCardEffectsRaf = null;
+  function initWLCardEffects(grid) {
+    if (wlCardEffectsRaf) { cancelAnimationFrame(wlCardEffectsRaf); wlCardEffectsRaf = null; }
+    const wlCards = Array.from(grid.querySelectorAll('.wl-card'));
+    if (!wlCards.length) return;
+
+    wlCards.forEach(card => {
+      card._tiltX = 0; card._tiltY = 0; card._tgtX = 0; card._tgtY = 0;
+      card._hovered = false; card._glossX = 50; card._glossY = 50;
+      card.style.position = 'relative';
+
+      card.addEventListener('mouseenter', () => { card._hovered = true; });
+      card.addEventListener('mousemove', e => {
+        const r = card.getBoundingClientRect();
+        card._tgtX = -((e.clientY - r.top  - r.height/2) / (r.height/2)) * 10.8;
+        card._tgtY =  ((e.clientX - r.left - r.width /2) / (r.width /2)) * 10.8;
+        card._glossX = ((e.clientX - r.left) / r.width)  * 100;
+        card._glossY = ((e.clientY - r.top)  / r.height) * 100;
+      });
+      card.addEventListener('mouseleave', () => {
+        card._hovered = false; card._tgtX = 0; card._tgtY = 0;
+        const g = card.querySelector('.card-gloss');
+        if (g) g.style.opacity = '0';
+      });
+    });
+
+    const scrollShifts = new Map();
+    function updateScrollShifts() {
+      wlCards.forEach(card => {
+        const rect = card.getBoundingClientRect();
+        const vhC = window.innerHeight / 2;
+        const cardC = rect.top + rect.height / 2;
+        scrollShifts.set(card, ((cardC - vhC) / window.innerHeight) * 12);
+      });
+    }
+    window.addEventListener('scroll', updateScrollShifts, {passive:true});
+    updateScrollShifts();
+
+    function tick() {
+      wlCards.forEach(card => {
+        if (card.classList.contains('dragging')) return;
+        const scrollY = scrollShifts.get(card) || 0;
+        card._tiltX += (card._tgtX - card._tiltX) * 0.10;
+        card._tiltY += (card._tgtY - card._tiltY) * 0.10;
+
+        card.style.transform =
+          `translateY(${scrollY.toFixed(2)}px) ` +
+          `perspective(700px) ` +
+          `rotateX(${card._tiltX.toFixed(2)}deg) ` +
+          `rotateY(${card._tiltY.toFixed(2)}deg)`;
+
+        const glow = card._hovered ? ',0 0 32px 5px rgba(184,145,46,0.45),0 0 60px 10px rgba(184,145,46,0.13)' : '';
+        card.style.boxShadow =
+          `0 0 0 1px rgba(184,145,46,0.16),inset 0 1px 0 rgba(255,255,255,0.09),0 2px 0 rgba(0,0,0,0.95),0 8px 24px rgba(0,0,0,0.85),0 24px 60px rgba(0,0,0,0.9)${glow}`;
+
+        if (card._hovered) {
+          const g = card.querySelector('.card-gloss');
+          if (g) {
+            g.style.background = `radial-gradient(circle at ${card._glossX.toFixed(0)}% ${card._glossY.toFixed(0)}%,rgba(255,225,140,0.38) 0%,rgba(216,180,100,0.12) 40%,transparent 65%)`;
+            g.style.opacity = '1';
+          }
+        }
+      });
+      wlCardEffectsRaf = requestAnimationFrame(tick);
+    }
+    wlCardEffectsRaf = requestAnimationFrame(tick);
   }
 
   render();
