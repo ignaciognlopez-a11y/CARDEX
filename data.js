@@ -152,7 +152,25 @@ window.portfolioData = {
       set: "Origins",
       condition: "Raw",
       status: "Holding",
-      qty: 2,
+      qty: 1,
+      buyPrice: 40,
+      currentPrice: 35,
+      image: "https://static.dotgg.gg/riftbound/cards/OGN-151b.webp",
+      cardNumber: "OGN-151b",
+      cardmarketUrl: CM + "/en/Riftbound/Products/Singles/Origins-Promos/Lee-Sin-Centered" + CM_FILTERS,
+      priceHistory: [
+        { date: "2026-07-06", price: 24.99 },
+        { date: "2026-07-07", price: 35 }
+      ]
+    },
+
+    {
+      id: "OGN-151b-4",
+      name: "Lee Sin, Centered",
+      set: "Origins",
+      condition: "Raw",
+      status: "Holding",
+      qty: 1,
       buyPrice: 40,
       currentPrice: 35,
       image: "https://static.dotgg.gg/riftbound/cards/OGN-151b.webp",
