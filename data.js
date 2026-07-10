@@ -231,22 +231,23 @@ window.portfolioData = {
 
     {
       id: "OGN-119a",
-      name: "Ahri, Inquisitive (V.2 - Showcase)",
+      name: "Ahri, Inquisitive (V.1 - Epic)",
       set: "Origins",
       condition: "Raw",
       status: "Holding",
       qty: 1,
       buyPrice: 4,
-      currentPrice: 7.5,
-      image: "https://static.dotgg.gg/riftbound/cards/OGN-119a.webp",
-      cardNumber: "OGN-119a",
-      cardmarketUrl: "https://www.cardmarket.com/en/Riftbound/Products/Singles/Origins/Ahri-Inquisitive-V2-Overnumbered?language=1&minCondition=2&sellerCountry=1,2,3,33,35,5,6,8,9,11,12,7,14,15,37,16,17,36,21,18,19,20,22,23,24,25,26,27,29,31,30,10,28,4&sortBy=price_asc",
+      currentPrice: 3.6,
+      image: "https://static.dotgg.gg/riftbound/cards/OGN-119.webp",
+      cardNumber: "119",
+      cardmarketUrl: "https://www.cardmarket.com/en/Riftbound/Products/Singles/Origins/Ahri-Inquisitive-V1-Epic?language=1&minCondition=2&sellerCountry=1,2,3,33,35,5,6,8,9,11,12,7,14,15,37,16,17,36,21,18,19,20,22,23,24,25,26,27,29,31,30,10,28,4&sortBy=price_asc",
       buyDate: "2026-07-05",
       priceHistory: [
         { date: "2026-07-06", price: 7 },
         { date: "2026-07-07", price: 7 },
         { date: "2026-07-08", price: 7.5 },
-        { date: "2026-07-09", price: 7.25 }
+        { date: "2026-07-09", price: 7.25 },
+        { date: "2026-07-10", price: 3.6 }
       ]
     },
 
@@ -685,20 +686,21 @@ window.portfolioData = {
 
     {
       id: "OGN-119a-2",
-      name: "Ahri, Inquisitive (V.2 - Showcase)",
+      name: "Ahri, Inquisitive (V.1 - Epic)",
       set: "Origins",
       condition: "Raw",
       status: "Holding",
       qty: 1,
       buyPrice: 4,
-      currentPrice: 7.5,
-      image: "https://static.dotgg.gg/riftbound/cards/OGN-119a.webp",
-      cardNumber: "OGN-119a",
-      cardmarketUrl: "https://www.cardmarket.com/en/Riftbound/Products/Singles/Origins/Ahri-Inquisitive-V2-Overnumbered?language=1&minCondition=2&sellerCountry=1,2,3,33,35,5,6,8,9,11,12,7,14,15,37,16,17,36,21,18,19,20,22,23,24,25,26,27,29,31,30,10,28,4&sortBy=price_asc",
+      currentPrice: 3.6,
+      image: "https://static.dotgg.gg/riftbound/cards/OGN-119.webp",
+      cardNumber: "119",
+      cardmarketUrl: "https://www.cardmarket.com/en/Riftbound/Products/Singles/Origins/Ahri-Inquisitive-V1-Epic?language=1&minCondition=2&sellerCountry=1,2,3,33,35,5,6,8,9,11,12,7,14,15,37,16,17,36,21,18,19,20,22,23,24,25,26,27,29,31,30,10,28,4&sortBy=price_asc",
       buyDate: "2026-07-05",
       priceHistory: [
         { date: "2026-07-08", price: 7.5 },
-        { date: "2026-07-09", price: 7.25 }
+        { date: "2026-07-09", price: 7.25 },
+        { date: "2026-07-10", price: 3.6 }
       ]
     },
 
