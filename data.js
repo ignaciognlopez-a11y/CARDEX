@@ -1408,7 +1408,7 @@ window.portfolioData = {
       qty: 1,
       buyPrice: 15,
       currentPrice: 12.8,
-      image: "https://static.dotgg.gg/riftbound/cards/OGN-021.webp",
+      image: "https://images.tcggo.com/tcggo/storage/35757/conversions/lux-lady-of-luminosity-ogn-021-origins-promos-large.webp",
       cardNumber: "021",
       cardmarketUrl: "https://www.cardmarket.com/en/Riftbound/Products/Singles/Origins-Promos/Lux-Lady-of-Luminosity?language=1&minCondition=2&sellerCountry=1,2,3,33,35,5,6,8,9,11,12,7,14,15,37,16,17,36,21,18,19,20,22,23,24,25,26,27,29,31,30,10,28,4&sortBy=price_asc",
       buyDate: "2026-07-12",
