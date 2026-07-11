@@ -425,7 +425,7 @@
 <script src="data.js"></script>
 <script>
 (function(){
-  const fmt     = n => n.toLocaleString('de-DE',{minimumFractionDigits:0,maximumFractionDigits:0})+' €';
+  const fmt     = n => (n===null||n===undefined) ? '—' : n.toLocaleString('de-DE',{minimumFractionDigits:0,maximumFractionDigits:0})+' €';
   const fmtSign = n => (n>=0?'+':'')+fmt(n);
   const fmtPct  = n => (n>=0?'+':'')+n.toFixed(1)+'%';
   const badgeClass = s => ({Origins:'badge-origins',Unleashed:'badge-unleashed',Spiritforged:'badge-spiritforged','Proving Grounds':'badge-proving'}[s]||'');

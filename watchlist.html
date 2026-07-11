@@ -288,7 +288,7 @@
 <script src="data.js"></script>
 <script>
 (function () {
-  const fmt    = n => n.toLocaleString('de-DE', {minimumFractionDigits:0, maximumFractionDigits:0}) + ' €';
+  const fmt    = n => (n === null || n === undefined) ? '—' : n.toLocaleString('de-DE', {minimumFractionDigits:0, maximumFractionDigits:0}) + ' €';
   const fmtUSD = n => '$' + n.toLocaleString('en-US', {minimumFractionDigits:0, maximumFractionDigits:0});
   const fmtPct = n => (n >= 0 ? '+' : '') + n.toFixed(1) + '%';
 
