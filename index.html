@@ -422,7 +422,55 @@
   </div>
 </div>
 
-<script src="data.js"></script>
+<script>
+  // ============================================================
+  //  Carga de datos en vivo desde Supabase
+  //  Proyecto: Cardex tracking (fsmuhcvmifvyvjjpmtdx)
+  //  Tabla: riftbound_inversiones (lectura pública vía policy RLS)
+  //  Sustituye al antiguo data.js estático (13 julio 2026)
+  // ============================================================
+  const SUPABASE_URL = "https://fsmuhcvmifvyvjjpmtdx.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_WJTVFkd8c12jW6VJOwXcQQ_0XBkU_Bn";
+
+  window.__portfolioDataPromise = fetch(
+    SUPABASE_URL + "/rest/v1/riftbound_inversiones?select=*",
+    { headers: { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY } }
+  )
+  .then(function(r){
+    if(!r.ok) throw new Error("Supabase fetch failed: " + r.status);
+    return r.json();
+  })
+  .then(function(rows){
+    const cards = rows.map(function(row){
+      return {
+        id: row.card_number || row.id,
+        name: row.card_name,
+        set: row.set,
+        condition: row.condition,
+        status: row.status,
+        qty: 1,
+        buyPrice: row.buy_price === null ? 0 : Number(row.buy_price),
+        currentPrice: row.current_price === null ? 0 : Number(row.current_price),
+        image: row.card_image || "",
+        cardNumber: row.card_number,
+        cardmarketUrl: row.cardmarket_url,
+        buyDate: row.buy_date,
+        priceHistory: row.price_history || [],
+        rarity: row.rarity,
+        excludeFromCap: row.exclude_from_cap === true
+      };
+    });
+    const updatedAt = rows.reduce(function(max, row){
+      const u = row.updated_at ? row.updated_at.slice(0,10) : null;
+      return (u && (!max || u > max)) ? u : max;
+    }, null);
+    window.portfolioData = { updatedAt: updatedAt || new Date().toISOString().slice(0,10), cards: cards };
+  })
+  .catch(function(err){
+    console.error("Error cargando datos de Supabase:", err);
+    window.portfolioData = { updatedAt: null, cards: [] };
+  });
+</script>
 <script>
 (function(){
   const fmt     = n => (n===null||n===undefined) ? '—' : n.toLocaleString('de-DE',{minimumFractionDigits:0,maximumFractionDigits:0})+' €';
@@ -983,6 +1031,7 @@
     });
   }
 
+  window.__portfolioDataPromise.then(function(){
   render();
 
   // ── FLOATING + PARALLAX + 3D TILT + GLOSS (portfolio cards only) ──
@@ -1059,6 +1108,7 @@
     requestAnimationFrame(tick);
   }
   initCardEffects();
+  }); // fin window.__portfolioDataPromise.then
 
   document.querySelectorAll('a.nav-link:not(.active)').forEach(link=>{
     link.addEventListener('click',function(e){
