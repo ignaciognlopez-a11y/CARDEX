@@ -101,7 +101,8 @@
     .pnl-modal { background:rgba(10,10,10,0.96); border:1px solid rgba(184,145,46,0.29); border-radius:16px; width:460px; max-width:95vw; max-height:80vh; display:flex; flex-direction:column; box-shadow:0 32px 80px rgba(0,0,0,0.9),0 0 0 1px rgba(184,145,46,0.13); animation:pnl-in 0.25s cubic-bezier(0.34,1.4,0.64,1) both; backdrop-filter:blur(24px); }
     @keyframes pnl-in { from{opacity:0;transform:scale(0.9) translateY(20px)} to{opacity:1;transform:scale(1) translateY(0)} }
     .pnl-header { padding:16px 20px 12px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); flex-shrink:0; }
-    .pnl-title { font-size:15px; font-weight:800; letter-spacing:-0.3px; }
+    .pnl-title { font-size:15px; font-weight:800; letter-spacing:-0.3px; display:flex; align-items:center; gap:6px; }
+    .pnl-info { width:15px; height:15px; border-radius:50%; border:1px solid rgba(184,145,46,0.45); color:var(--gold); font-size:10px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; cursor:help; flex-shrink:0; }
     .pnl-totals { display:flex; gap:16px; align-items:baseline; }
     .pnl-total-val { font-size:22px; font-weight:800; letter-spacing:-0.5px; }
     .pnl-total-pct { font-size:12px; font-weight:700; }
@@ -293,6 +294,7 @@
     <a class="nav-link active" href="index.html">Portfolio</a>
     <a class="nav-link" href="watchlist.html">Watchlist</a>
     <a class="nav-link" href="monthly.html">Monthly</a>
+    <a class="nav-link" href="sold.html">Sold</a>
   </nav>
   <span class="updated" id="updated-label"></span>
 </header>
@@ -301,7 +303,7 @@
   <div class="top-row">
     <div class="summary-panel">
       <div class="summary-box">
-        <div class="summary-metric clickable" id="invested-metric" title="Total amount paid for positions in Holding and Sold status. Click to see the full breakdown.">
+        <div class="summary-metric clickable" id="invested-metric" title="Total amount paid for positions currently in Holding status. Click to see the full breakdown.">
           <span class="sm-label">Total Invested ↗</span>
           <span class="sm-value" id="s-invested">—</span>
           <span class="sm-sub">cost basis</span>
@@ -321,10 +323,15 @@
           <span class="sm-value" id="s-total">—</span>
           <span class="sm-sub">all positions</span>
         </div>
-        <div class="summary-metric clickable span-2" id="sold-metric" title="Total amount already received from completed sales. Click to see the full breakdown.">
+        <div class="summary-metric clickable" id="sold-metric" title="Total amount already received from completed sales. Click to see the full breakdown.">
           <span class="sm-label">Total Sold ↗</span>
           <span class="sm-value" id="s-sold">—</span>
           <span class="sm-sub" id="s-sold-count">no sales yet</span>
+        </div>
+        <div class="summary-metric clickable" id="flow-metric" title="Total Invested plus Total Sold — everything you've put into the portfolio plus everything you've already cashed out from sales. Click to see the full breakdown.">
+          <span class="sm-label">Invested + Cashed Out ↗</span>
+          <span class="sm-value" id="s-flow">—</span>
+          <span class="sm-sub">capital in + capital out</span>
         </div>
       </div>
     </div>
@@ -414,7 +421,7 @@
   <div class="pnl-modal">
     <div class="pnl-header">
       <div>
-        <div class="pnl-title">P&amp;L Breakdown</div>
+        <div class="pnl-title">P&amp;L <span class="pnl-info" title="Change in value of your paid positions compared to what you paid for them.">ⓘ</span></div>
         <div class="pnl-totals">
           <span class="pnl-total-val" id="pnl-total-val">—</span>
           <span class="pnl-total-pct" id="pnl-total-pct"></span>
@@ -430,7 +437,7 @@
   <div class="pnl-modal">
     <div class="pnl-header">
       <div>
-        <div class="pnl-title">Total Market Value Breakdown</div>
+        <div class="pnl-title">Total Market Value <span class="pnl-info" title="Current market value of all Holding items, including free ones.">ⓘ</span></div>
         <div class="pnl-totals">
           <span class="pnl-total-val" id="total-total-val">—</span>
         </div>
@@ -445,7 +452,7 @@
   <div class="pnl-modal">
     <div class="pnl-header">
       <div>
-        <div class="pnl-title">Sold Positions Breakdown</div>
+        <div class="pnl-title">Sold Positions <span class="pnl-info" title="Total amount already received from completed sales.">ⓘ</span></div>
         <div class="pnl-totals">
           <span class="pnl-total-val" id="sold-total-val">—</span>
         </div>
@@ -460,7 +467,7 @@
   <div class="pnl-modal">
     <div class="pnl-header">
       <div>
-        <div class="pnl-title">Paid Positions Value Breakdown</div>
+        <div class="pnl-title">Paid Positions Value <span class="pnl-info" title="Current market value of only the positions you paid for, excluding free items.">ⓘ</span></div>
         <div class="pnl-totals">
           <span class="pnl-total-val" id="paid-total-val">—</span>
         </div>
@@ -471,11 +478,26 @@
   </div>
 </div>
 
+<div class="pnl-overlay" id="flow-overlay">
+  <div class="pnl-modal">
+    <div class="pnl-header">
+      <div>
+        <div class="pnl-title">Invested + Cashed Out <span class="pnl-info" title="Total Invested plus Total Sold — everything you've put into the portfolio plus everything you've already cashed out from sales.">ⓘ</span></div>
+        <div class="pnl-totals">
+          <span class="pnl-total-val" id="flow-total-val">—</span>
+        </div>
+      </div>
+      <button class="pnl-close" id="flow-close">✕</button>
+    </div>
+    <div class="pnl-list" id="flow-list"></div>
+  </div>
+</div>
+
 <div class="pnl-overlay" id="invested-overlay">
   <div class="pnl-modal">
     <div class="pnl-header">
       <div>
-        <div class="pnl-title">Total Invested Breakdown</div>
+        <div class="pnl-title">Total Invested <span class="pnl-info" title="Total amount paid for positions currently in Holding status.">ⓘ</span></div>
         <div class="pnl-totals">
           <span class="pnl-total-val" id="invested-total-val">—</span>
         </div>
@@ -757,7 +779,7 @@
     if (e.key !== 'Escape') return;
     const modalOv = document.getElementById('modal-overlay');
     if (modalOv && modalOv.classList.contains('open')) { closeModal(); return; }
-    ['pnl-overlay','total-overlay','invested-overlay','paid-overlay','sold-overlay'].forEach(function(id){
+    ['pnl-overlay','total-overlay','invested-overlay','paid-overlay','sold-overlay','flow-overlay'].forEach(function(id){
       const el = document.getElementById(id);
       if (el && el.classList.contains('open')) {
         el.classList.remove('open');
@@ -1026,12 +1048,13 @@
 
     const totalValue=holding.reduce((s,c)=>s+c.currentPrice*(c.qty||1),0);
     const paid=holding.filter(c=>c.buyPrice>0);
-    const totalInvested=paid.reduce((s,c)=>s+c.buyPrice*(c.qty||1),0);
     const paidMarket=paid.reduce((s,c)=>s+c.currentPrice*(c.qty||1),0);
+    const sold=allCards.filter(c=>c.status==='Sold');
+    const totalInvested=paid.reduce((s,c)=>s+c.buyPrice*(c.qty||1),0);
     const pnl=paidMarket-totalInvested;
     const pct=totalInvested>0?pnl/totalInvested*100:0;
-    const sold=allCards.filter(c=>c.status==='Sold');
     const totalSold=sold.reduce((s,c)=>s+(c.sellPrice||0)*(c.qty||1),0);
+    const totalFlow=totalInvested+totalSold;
 
     document.getElementById('s-invested').textContent=fmt(totalInvested);
     document.getElementById('s-paid').textContent=fmt(paidMarket);
@@ -1042,6 +1065,7 @@
     pctEl.textContent=fmtPct(pct)+' on cost';pctEl.className='sm-sub '+(pnl>=0?'pos':'neg');
     document.getElementById('s-sold').textContent=fmt(totalSold);
     document.getElementById('s-sold-count').textContent=sold.length?(sold.length+(sold.length===1?' sale':' sales')):'no sales yet';
+    document.getElementById('s-flow').textContent=fmt(totalFlow);
 
     const upd=window.portfolioData.updatedAt;
     if(upd)document.getElementById('updated-label').textContent='Updated '+new Date(upd+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
@@ -1229,7 +1253,7 @@
       }
     });
 
-    // ── TOTAL INVESTED BREAKDOWN MODAL (precios de compra, incluye free) ──
+    // ── TOTAL INVESTED BREAKDOWN MODAL (precios de compra, incluye free, solo Holding) ──
     document.getElementById('invested-metric').addEventListener('click', () => {
       const rows = holding.map(c => ({ ...c, lineCost: c.buyPrice * (c.qty || 1) }))
         .sort((a, b) => b.lineCost - a.lineCost);
@@ -1237,7 +1261,7 @@
       document.getElementById('invested-list').innerHTML = rows.map(r => `<div class="simple-row">
           <img class="simple-img" src="${r.image}" alt="${r.name}" onerror="this.style.opacity=0.1"/>
           <span class="simple-name">${r.name}</span>
-          <span class="simple-price ${r.buyPrice === 0 ? 'free' : ''}">${r.buyPrice === 0 ? 'Gratis' : fmt(r.lineCost)}</span>
+          <span class="simple-price ${r.buyPrice === 0 ? 'free' : ''}">${r.buyPrice === 0 ? 'Free' : fmt(r.lineCost)}</span>
         </div>`).join('');
       document.getElementById('invested-overlay').classList.add('open');
       document.body.style.overflow = 'hidden';
@@ -1249,6 +1273,31 @@
     document.getElementById('invested-overlay').addEventListener('click', e => {
       if (e.target.id === 'invested-overlay') {
         document.getElementById('invested-overlay').classList.remove('open');
+        document.body.style.overflow = '';
+      }
+    });
+
+    // ── INVESTED + CASHED OUT BREAKDOWN MODAL (Total Invested + Total Sold combined) ──
+    document.getElementById('flow-metric').addEventListener('click', () => {
+      document.getElementById('flow-total-val').textContent = fmt(totalFlow);
+      const investedRows = paid.map(c => ({ ...c, lineValue: c.buyPrice * (c.qty || 1), tag:'Invested' }));
+      const cashedRows = sold.map(c => ({ ...c, lineValue: (c.sellPrice||0) * (c.qty || 1), tag:'Cashed out' }));
+      const rows = [...investedRows, ...cashedRows].sort((a,b)=>b.lineValue-a.lineValue);
+      document.getElementById('flow-list').innerHTML = rows.map(r => `<div class="simple-row">
+          <img class="simple-img" src="${r.image}" alt="${r.name}" onerror="this.style.opacity=0.1"/>
+          <span class="simple-name">${r.name} <span style="color:var(--text-muted);font-weight:500;">(${r.tag})</span></span>
+          <span class="simple-price">${fmt(r.lineValue)}</span>
+        </div>`).join('');
+      document.getElementById('flow-overlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    });
+    document.getElementById('flow-close').addEventListener('click', () => {
+      document.getElementById('flow-overlay').classList.remove('open');
+      document.body.style.overflow = '';
+    });
+    document.getElementById('flow-overlay').addEventListener('click', e => {
+      if (e.target.id === 'flow-overlay') {
+        document.getElementById('flow-overlay').classList.remove('open');
         document.body.style.overflow = '';
       }
     });
