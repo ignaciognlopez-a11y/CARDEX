@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Cardex — Sold</title>
+  <title>Cardex — Invested</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Montserrat:wght@800&display=swap" rel="stylesheet"/>
 <style>
@@ -285,43 +285,21 @@
     @media (max-width:540px)  { .card-grid { grid-template-columns:repeat(2,1fr); column-gap:2.5vw; padding:0 2.5vw; } .summary-box { grid-template-columns:repeat(2,1fr); } }
     @media (max-width:760px) { .chart-wrap, #modal-spark, .modal-spark-empty { height:220px; } }
   </style>
-  <style>
-    .sold-summary { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:24px; max-width:760px; }
-    .empty-state { padding:40px 20px; text-align:center; color:var(--text-muted); font-size:13px; border:1px dashed rgba(184,145,46,0.29); border-radius:var(--radius); }
-  </style>
 </head>
 <body>
 <header>
   <span class="logo-text">CARDEX</span>
-  <span class="page-title" style="font-size:13px;font-weight:700;color:var(--text-muted);margin-left:4px;">Sold</span>
+  <span class="page-title" style="font-size:13px;font-weight:700;color:var(--text-muted);margin-left:4px;">Invested</span>
   <span class="updated" id="updated-label"></span>
 </header>
 
 <main>
-  <div class="sold-summary">
-    <div class="summary-metric" title="Total amount received from completed sales.">
-      <span class="sm-label">Total Cashed Out</span>
-      <span class="sm-value" id="s-total-sold">—</span>
-      <span class="sm-sub" id="s-sale-count">no sales yet</span>
-    </div>
-    <div class="summary-metric" title="Realized profit or loss: total sell price minus what you originally paid, for sold items with a purchase cost.">
-      <span class="sm-label">Realized P&amp;L</span>
-      <span class="sm-value" id="s-realized-pnl">—</span>
-      <span class="sm-sub" id="s-realized-pct">—</span>
-    </div>
-    <div class="summary-metric" title="Average amount received per sale.">
-      <span class="sm-label">Average Sale</span>
-      <span class="sm-value" id="s-avg-sale">—</span>
-      <span class="sm-sub">per item sold</span>
-    </div>
-  </div>
-
-  <div class="section-wrap" id="sold-section">
+  <div class="section-wrap" id="monthly-section">
     <div class="section-header">
-      <h2>Sold Items</h2>
-      <span class="section-count" id="sold-count"></span>
+      <h2>Monthly Investment</h2>
+      <span class="section-count" id="monthly-count"></span>
     </div>
-    <div id="sold-table-holder"></div>
+    <div class="month-panel" id="month-accordion"></div>
   </div>
 </main>
 
@@ -333,119 +311,71 @@
   const fmt     = n => (n===null||n===undefined) ? '—' : n.toLocaleString('de-DE',{minimumFractionDigits:0,maximumFractionDigits:0})+' €';
   const fmtSign = n => (n>=0?'+':'')+fmt(n);
   const fmtPct  = n => (n>=0?'+':'')+n.toFixed(1)+'%';
-  const badgeClass = s => ({Origins:'badge-origins',Unleashed:'badge-unleashed',Spiritforged:'badge-spiritforged','Proving Grounds':'badge-proving'}[s]||'badge-default');
-  const cmUrl = item => item.cardmarketUrl || 'https://www.cardmarket.com/en/Riftbound/Products/Search?searchString='+encodeURIComponent(item.name);
 
-  let sortField = 'sellDate', sortDir = 'desc';
-  let soldItems = [];
-
-  function compareSold(a, b, field, dir){
-    let va, vb;
-    switch(field){
-      case 'cardNumber': va=a.cardNumber||''; vb=b.cardNumber||''; break;
-      case 'name':       va=a.name||'';       vb=b.name||'';       break;
-      case 'set':        va=a.set||'';        vb=b.set||'';        break;
-      case 'buyPrice':   va=a.buyPrice||0;     vb=b.buyPrice||0;     break;
-      case 'sellPrice':  va=a.sellPrice||0;    vb=b.sellPrice||0;    break;
-      case 'sellDate':   va=a.sellDate||'';    vb=b.sellDate||'';    break;
-      case 'pnl':
-        va = a.buyPrice>0 ? (a.sellPrice-a.buyPrice)/a.buyPrice : -Infinity;
-        vb = b.buyPrice>0 ? (b.sellPrice-b.buyPrice)/b.buyPrice : -Infinity;
-        break;
-      default: va=0; vb=0;
-    }
-    if (typeof va === 'string'){ const c=va.localeCompare(vb); return dir==='asc'?c:-c; }
-    return dir==='asc' ? va-vb : vb-va;
+  function monthLabel(key){
+    const [y,m]=key.split('-').map(Number);
+    return new Date(y,m-1,1).toLocaleDateString('en-GB',{month:'long',year:'numeric'});
   }
 
-  function buildRow(item){
-    const qty = item.qty || 1;
-    const hasCost = item.buyPrice > 0;
-    const pnlEur = hasCost ? (item.sellPrice - item.buyPrice) * qty : null;
-    const pnlPct = hasCost ? (item.sellPrice - item.buyPrice) / item.buyPrice * 100 : null;
-    const pos = pnlEur !== null && pnlEur >= 0;
-    const pnlCls = pnlEur === null ? 'neu' : (pos ? 'pos' : 'neg');
-    const pnlTxt = pnlEur === null ? '—' : `${fmtPct(pnlPct)} (${fmtSign(pnlEur)})`;
-    const dateTxt = item.sellDate ? new Date(item.sellDate+'T12:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'2-digit'}) : '—';
-    return `<tr data-id="${item.id}" style="cursor:pointer;">
-      <td>${item.cardNumber||'—'}</td>
-      <td class="ht-name"><img src="${item.image}" alt="" onerror="this.style.opacity=0"/>${item.name}</td>
-      <td>${item.set?`<span class="badge ${badgeClass(item.set)}">${item.set}</span>`:'—'}</td>
-      <td class="ht-num">${hasCost?fmt(item.buyPrice*qty):'Free'}</td>
-      <td class="ht-num">${fmt((item.sellPrice||0)*qty)}</td>
-      <td>${dateTxt}</td>
-      <td class="ht-pnl ${pnlCls}">${pnlTxt}</td>
-      <td class="ht-link"><a href="${cmUrl(item)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="View on Cardmarket">↗</a></td>
-    </tr>`;
-  }
+  function renderMonthly(holding){
+    const withDate=holding.filter(c=>c.buyDate);
+    const groups={};
+    withDate.forEach(c=>{
+      const key=c.buyDate.slice(0,7);
+      (groups[key]=groups[key]||[]).push(c);
+    });
+    const keys=Object.keys(groups).sort().reverse();
+    const wrap=document.getElementById('month-accordion');
+    document.getElementById('monthly-count').textContent=keys.length+(keys.length===1?' month':' months');
 
-  function renderTable(){
-    const sorted = [...soldItems].sort((a,b)=>compareSold(a,b,sortField,sortDir));
-    document.getElementById('sold-table-holder').innerHTML = `
-      <div class="holding-table-wrap">
-        <table class="holding-table">
-          <thead>
-            <tr class="sold-table-head">
-              <th data-sort="cardNumber">Card #</th>
-              <th data-sort="name">Card Name</th>
-              <th data-sort="set">Set</th>
-              <th data-sort="buyPrice" style="text-align:right">Buy</th>
-              <th data-sort="sellPrice" style="text-align:right">Sold For</th>
-              <th data-sort="sellDate">Sell Date</th>
-              <th data-sort="pnl" style="text-align:right">Realized P&amp;L</th>
-              <th style="text-align:center">Link</th>
-            </tr>
-          </thead>
-          <tbody>${sorted.map(buildRow).join('')}</tbody>
-        </table>
+    wrap.innerHTML=keys.map(key=>{
+      const items=groups[key].slice().sort((a,b)=>new Date(b.buyDate)-new Date(a.buyDate));
+      const paidItems=items.filter(c=>c.buyPrice>0);
+      const total=paidItems.reduce((s,c)=>s+c.buyPrice*(c.qty||1),0);
+      const cappedTotal=paidItems.filter(c=>!c.excludeFromCap).reduce((s,c)=>s+c.buyPrice*(c.qty||1),0);
+      const overCap=cappedTotal>500;
+
+      const rows=items.map(c=>{
+        const dateTxt=new Date(c.buyDate+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+        const isFree=!c.buyPrice||c.buyPrice===0;
+        const pct=isFree?null:(c.currentPrice-c.buyPrice)/c.buyPrice*100;
+        const pos=pct!==null&&pct>=0;
+        return `<div class="month-card-row">
+          <img class="month-card-img" src="${c.image||''}" alt="${c.name}" onerror="this.style.opacity=0.1"/>
+          <span class="month-card-name">${c.name}</span>
+          <span class="month-card-date">${dateTxt}</span>
+          <span class="month-card-buy ${isFree?'free':''}">${isFree?'Free':fmt(c.buyPrice)}</span>
+          <span class="month-card-current">${fmt(c.currentPrice)}</span>
+          <span class="month-card-pct ${pct===null?'':(pos?'pos':'neg')}">${pct===null?'—':(pos?'+':'')+pct.toFixed(1)+'%'}</span>
+        </div>`;
+      }).join('');
+
+      return `<div class="month-row" data-month="${key}">
+        <div class="month-row-head">
+          <span class="month-toggle-icon">▸</span>
+          <span class="month-label">${monthLabel(key)}</span>
+          <span class="month-count">${items.length} ${items.length===1?'buy':'buys'}</span>
+          <span class="month-total">${fmt(total)}</span>
+          ${overCap?'<span class="month-cap-flag" title="Exceeds the €500 monthly cap">⚠️</span>':''}
+        </div>
+        <div class="month-detail">${rows}</div>
       </div>`;
-    document.querySelectorAll('.sold-table-head th[data-sort]').forEach(th=>{
-      th.classList.toggle('sorted', th.dataset.sort===sortField);
-      if (th.dataset.sort===sortField){
-        th.insertAdjacentHTML('beforeend', `<span class="sort-arrow">${sortDir==='asc'?'▲':'▼'}</span>`);
-      }
-      th.addEventListener('click', ()=>{
-        const field = th.dataset.sort;
-        if (sortField===field){ sortDir = sortDir==='asc'?'desc':'asc'; }
-        else { sortField=field; sortDir = ['name','set','cardNumber'].includes(field)?'asc':'desc'; }
-        renderTable();
+    }).join('');
+
+    wrap.querySelectorAll('.month-row-head').forEach(head=>{
+      head.addEventListener('click',()=>{
+        head.parentElement.classList.toggle('open');
       });
     });
-    document.querySelectorAll('#sold-table-holder tbody tr[data-id]').forEach(tr=>{
-      tr.addEventListener('click', ()=>{ const item = soldItems.find(c=>c.id===tr.dataset.id); if(item) window.CardexOpenMove(item); });
-    });
   }
 
-  function renderPage(){
-    soldItems = (window.portfolioData?.cards || []).filter(c => c.status === 'Sold');
-    const count = soldItems.length;
-    const totalSold = soldItems.reduce((s,c)=>s+(c.sellPrice||0)*(c.qty||1),0);
-    const paidSold = soldItems.filter(c=>c.buyPrice>0);
-    const costBasis = paidSold.reduce((s,c)=>s+c.buyPrice*(c.qty||1),0);
-    const realizedPnl = paidSold.reduce((s,c)=>s+(c.sellPrice-c.buyPrice)*(c.qty||1),0);
-    const realizedPct = costBasis>0 ? realizedPnl/costBasis*100 : 0;
-    const avgSale = count ? totalSold/count : 0;
 
-    document.getElementById('s-total-sold').textContent = fmt(totalSold);
-    document.getElementById('s-sale-count').textContent = count ? (count+(count===1?' sale':' sales')) : 'no sales yet';
-    const pnlEl = document.getElementById('s-realized-pnl');
-    pnlEl.textContent = paidSold.length ? fmtSign(realizedPnl) : '—';
-    pnlEl.className = 'sm-value'+(paidSold.length ? (realizedPnl>=0?' pos':' neg') : '');
-    document.getElementById('s-realized-pct').textContent = paidSold.length ? fmtPct(realizedPct)+' on cost' : '—';
-    document.getElementById('s-avg-sale').textContent = count ? fmt(avgSale) : '—';
-    document.getElementById('sold-count').textContent = count + (count===1?' item':' items');
-
-    if (!count){
-      document.getElementById('sold-table-holder').innerHTML = '<div class="empty-state">No sales recorded yet. Sold cards will show up here once you mark a position as sold.</div>';
-    } else {
-      renderTable();
-    }
-
+  window.__portfolioDataPromise.then(function(){
+    const holding = (window.portfolioData?.cards || []).filter(c => c.status === 'Holding');
+    renderMonthly(holding);
     const upd = window.portfolioData.updatedAt;
     if (upd) document.getElementById('updated-label').textContent = 'Updated ' + new Date(upd+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
-  }
-  window.CardexOnDataChange = renderPage;
-  window.__portfolioDataPromise.then(renderPage);
+  });
 })();
 </script>
 </body>

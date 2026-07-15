@@ -231,12 +231,7 @@
 
 <header>
   <span class="logo-text">CARDEX</span>
-  <nav>
-    <a class="nav-link" href="index.html">Portfolio</a>
-    <a class="nav-link active" href="watchlist.html">Watchlist</a>
-    <a class="nav-link" href="monthly.html">Monthly</a>
-    <a class="nav-link" href="sold.html">Sold</a>
-  </nav>
+  <span class="page-title" style="font-size:13px;font-weight:700;color:var(--text-muted);margin-left:4px;">Watchlist</span>
   <span class="updated" id="updated-label"></span>
 </header>
 
@@ -287,15 +282,17 @@
       <div id="modal-sales-content"></div>
       <div class="modal-actions">
         <a class="btn-cardmarket" id="modal-cm-link" href="#" target="_blank" rel="noopener">↗ Cardmarket</a>
+        <button class="btn-edit" id="modal-edit-btn" style="flex:0 0 auto;padding:9px 16px;border-radius:8px;background:transparent;color:var(--gold);border:1px solid rgba(184,145,46,0.4);font-size:12px;font-weight:700;cursor:pointer;">Mover / editar</button>
         <button class="btn-close" id="modal-close-btn">Close</button>
       </div>
     </div>
   </div>
 </div>
 
-<script src="data.js"></script>
+<script src="cardex-shared.js"></script>
 <script>
 (function () {
+  let currentModalItem = null;
   const fmt    = n => (n === null || n === undefined) ? '—' : n.toLocaleString('de-DE', {minimumFractionDigits:0, maximumFractionDigits:0}) + ' €';
   const fmtUSD = n => '$' + n.toLocaleString('en-US', {minimumFractionDigits:0, maximumFractionDigits:0});
   const fmtPct = n => (n >= 0 ? '+' : '') + n.toFixed(1) + '%';
@@ -402,6 +399,7 @@
   }
 
   function openModal(item) {
+    currentModalItem = item;
     const img = document.getElementById('modal-img');
     img.src = item.image || FALLBACK_IMG;
     img.onerror = () => { img.src = FALLBACK_IMG; };
@@ -483,6 +481,7 @@
   }
   document.getElementById('modal-close-x').addEventListener('click', closeModal);
   document.getElementById('modal-close-btn').addEventListener('click', closeModal);
+  document.getElementById('modal-edit-btn').addEventListener('click', () => { if (currentModalItem) window.CardexOpenMove(currentModalItem); });
   document.getElementById('modal-overlay').addEventListener('click', e => { if (e.target.id==='modal-overlay') closeModal(); });
   document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); });
 
@@ -760,16 +759,8 @@
     wlCardEffectsRaf = requestAnimationFrame(tick);
   }
 
-  render();
-
-  document.querySelectorAll('a.nav-link:not(.active)').forEach(link => {
-    link.addEventListener('click', function(e) {
-      e.preventDefault();
-      const href = this.href;
-      document.querySelector('main').classList.add('leaving');
-      setTimeout(() => { window.location.href = href; }, 220);
-    });
-  });
+  window.CardexOnDataChange = render;
+  window.__portfolioDataPromise.then(render);
 })();
 </script>
 </body>
