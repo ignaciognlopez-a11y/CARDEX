@@ -75,6 +75,7 @@
     @media (max-width:900px) { .panel-grid { grid-template-columns:1fr; } }
     .panel { background:rgba(20,20,20,0.78); border:1px solid rgba(184,145,46,0.29); border-radius:var(--radius); padding:14px 16px; backdrop-filter:blur(20px); box-shadow:0 6px 24px rgba(0,0,0,0.55),0 0 0 1px rgba(255,255,255,0.04),inset 0 1px 0 rgba(255,255,255,0.06); }
     .panel-title { font-size:13px; font-weight:800; letter-spacing:-0.2px; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; }
+    .panel-title .p-main { font-size:15px; font-weight:800; letter-spacing:0.02em; text-transform:uppercase; color:var(--gold); }
     .panel-title .p-sub { font-size:10.5px; color:var(--text-muted); font-weight:600; }
 
     .perf-row { display:flex; align-items:center; gap:9px; padding:6px 2px; cursor:pointer; border-radius:7px; transition:background 0.12s; }
@@ -85,7 +86,13 @@
     .perf-pct.pos { color:var(--green); } .perf-pct.neg { color:var(--red); }
 
     .set-row { display:flex; align-items:center; gap:9px; padding:6px 2px; }
-    .set-name { font-size:12px; font-weight:700; width:120px; flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .set-icon { width:9px; height:9px; border-radius:3px; flex-shrink:0; }
+    .set-icon.badge-origins { background:rgba(80,120,255,0.9); }
+    .set-icon.badge-unleashed { background:rgba(220,70,70,0.9); }
+    .set-icon.badge-spiritforged { background:rgba(50,180,100,0.9); }
+    .set-icon.badge-proving { background:rgba(212,166,53,0.9); }
+    .set-icon.badge-default { background:rgba(150,150,150,0.7); }
+    .set-name { font-size:12px; font-weight:700; width:110px; flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .set-bar-wrap { flex:1; height:8px; border-radius:4px; background:rgba(255,255,255,0.06); overflow:hidden; }
     .set-bar { height:100%; background:linear-gradient(90deg,#8a6d1a,#d9b04a); border-radius:4px; }
     .set-val { font-size:11px; color:var(--text-muted); flex-shrink:0; width:78px; text-align:right; font-variant-numeric:tabular-nums; }
@@ -219,22 +226,22 @@
 
   <div class="panel-grid">
     <div class="panel">
-      <div class="panel-title" title="Your paid Holding positions with the best return on cost."><span>🏆 Top Performers</span><span class="p-sub">% on cost</span></div>
+      <div class="panel-title" title="Your paid Holding positions with the best return on cost."><span class="p-main">Top Performers</span><span class="p-sub">% on cost</span></div>
       <div id="top-performers"></div>
     </div>
     <div class="panel">
-      <div class="panel-title" title="Your paid Holding positions with the worst return on cost."><span>📉 Worst Performers</span><span class="p-sub">% on cost</span></div>
+      <div class="panel-title" title="Your paid Holding positions with the worst return on cost."><span class="p-main">Worst Performers</span><span class="p-sub">% on cost</span></div>
       <div id="worst-performers"></div>
     </div>
   </div>
 
   <div class="panel-grid">
     <div class="panel">
-      <div class="panel-title" title="Market value and item count of your Holding, grouped by set."><span>📦 Set Distribution</span><span class="p-sub">market value</span></div>
+      <div class="panel-title" title="Market value and item count of your Holding, grouped by set."><span class="p-main">Set Distribution</span><span class="p-sub">market value</span></div>
       <div id="set-distribution"></div>
     </div>
     <div class="panel">
-      <div class="panel-title" title="Your Holding items with the highest current market price."><span>💎 Most Expensive Items</span><span class="p-sub">Current Price</span></div>
+      <div class="panel-title" title="Your Holding items with the highest current market price."><span class="p-main">Most Expensive Items</span><span class="p-sub">Current Price</span></div>
       <div id="most-expensive"></div>
     </div>
   </div>
@@ -595,6 +602,7 @@
     const maxSetValue = setEntries.length ? setEntries[0][1].value : 1;
     document.getElementById('set-distribution').innerHTML = setEntries.length ? setEntries.map(([name,d])=>`
       <div class="set-row">
+        <span class="set-icon ${badgeClass(name)}"></span>
         <span class="set-name">${name}</span>
         <div class="set-bar-wrap"><div class="set-bar" style="width:${Math.max(4,(d.value/maxSetValue*100)).toFixed(1)}%"></div></div>
         <span class="set-val">${fmt(d.value)}</span>

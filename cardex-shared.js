@@ -250,9 +250,34 @@
     return '';
   }
 
+  function parseCardmarketUrl(url) {
+    try {
+      const u = new URL(url);
+      const parts = u.pathname.split('/').filter(Boolean);
+      const idx = parts.findIndex(function (p) { return p === 'Singles' || p === 'Sealed'; });
+      const type = idx >= 0 ? parts[idx] : null;
+      const setSeg = idx >= 0 ? parts[idx + 1] : null;
+      const slug = parts[parts.length - 1] || '';
+      const nameGuess = decodeURIComponent(slug).replace(/-/g, ' ').trim();
+      let setGuess = '';
+      if (setSeg) {
+        const norm = decodeURIComponent(setSeg).replace(/-/g, ' ').trim().toLowerCase();
+        const match = SET_OPTIONS.find(function (s) { return s.toLowerCase() === norm; });
+        if (match) setGuess = match;
+      }
+      const hasMinCondition = /minCondition=/.test(u.search);
+      const condition = type === 'Sealed' ? 'Sealed' : (hasMinCondition ? 'NM' : '');
+      return { name: nameGuess, set: setGuess, condition: condition };
+    } catch (e) {
+      return { name: '', set: '', condition: '' };
+    }
+  }
+
   function openAddModal(prefillStatus) {
     let status = prefillStatus || 'Holding';
     function render() {
+      const showPrice = status !== 'Watchlist';
+      const priceLabel = status === 'Sold' ? 'Sell price (€)' : 'Price paid (€)';
       openForm(
         '<div class="cx-form-title">Add card</div>' +
         '<div class="cx-form-status-tabs" id="cx-add-tabs">' +
@@ -260,19 +285,9 @@
           return '<div class="cx-status-tab' + (s === status ? ' active' : '') + '" data-status="' + s + '">' + s + '</div>';
         }).join('') +
         '</div>' +
-        '<div class="cx-form-row"><label>Card name (exact, as shown on Cardmarket)</label><input type="text" id="cx-f-name"/></div>' +
-        '<div class="cx-form-grid2">' +
-        '<div class="cx-form-row"><label>Set</label><select id="cx-f-set">' + optionsHtml(SET_OPTIONS, '') + '</select></div>' +
-        '<div class="cx-form-row"><label>Rarity</label><select id="cx-f-rarity">' + optionsHtml(RARITY_OPTIONS, '') + '</select></div>' +
-        '</div>' +
-        '<div class="cx-form-grid2">' +
-        '<div class="cx-form-row"><label>Card Number</label><input type="text" id="cx-f-cardNumber"/></div>' +
-        '<div class="cx-form-row"><label>Condition</label><input type="text" id="cx-f-condition" placeholder="NM / Sealed…"/></div>' +
-        '</div>' +
-        '<div class="cx-form-row"><label>Current Price (€)</label><input type="number" step="0.01" id="cx-f-currentPrice"/></div>' +
-        '<div class="cx-form-row"><label>Card Image (URL)</label><input type="text" id="cx-f-image"/></div>' +
-        '<div class="cx-form-row"><label>Cardmarket URL</label><input type="text" id="cx-f-cardmarketUrl"/></div>' +
-        '<div id="cx-add-status-fields">' + statusFieldsHtml(status) + '</div>' +
+        '<div class="cx-form-row"><label>Cardmarket link</label><input type="text" id="cx-f-url" placeholder="https://www.cardmarket.com/en/Riftbound/Products/..."/></div>' +
+        (showPrice ? '<div class="cx-form-row"><label>' + priceLabel + '</label><input type="number" step="0.01" id="cx-f-price"/></div>' : '') +
+        '<div style="font-size:11px;color:var(--text-muted);margin:2px 0 10px;line-height:1.4;">Card name, set and condition are guessed from the link — you can refine them anytime from chat.</div>' +
         '<div class="cx-form-error" id="cx-form-error"></div>' +
         '<div class="cx-form-actions">' +
         '<button class="cx-btn cx-btn-ghost" id="cx-form-cancel">Cancel</button>' +
@@ -289,27 +304,32 @@
   }
 
   function submitAdd(status) {
-    const name = document.getElementById('cx-f-name').value.trim();
     const errEl = document.getElementById('cx-form-error');
-    if (!name) { errEl.textContent = 'The card name is required.'; errEl.style.display = 'block'; return; }
+    const url = document.getElementById('cx-f-url').value.trim();
+    if (!url) { errEl.textContent = 'The Cardmarket link is required.'; errEl.style.display = 'block'; return; }
+    const priceEl = document.getElementById('cx-f-price');
+    let price = null;
+    if (priceEl) {
+      if (!priceEl.value) { errEl.textContent = 'Enter the price.'; errEl.style.display = 'block'; return; }
+      price = Number(priceEl.value);
+    }
+    const parsed = parseCardmarketUrl(url);
+    const today = new Date().toISOString().slice(0, 10);
     const fields = {
-      card_name: name,
-      set: document.getElementById('cx-f-set').value || null,
-      rarity: document.getElementById('cx-f-rarity').value || null,
-      card_number: document.getElementById('cx-f-cardNumber').value.trim() || null,
-      condition: document.getElementById('cx-f-condition').value.trim() || null,
-      current_price: document.getElementById('cx-f-currentPrice').value ? Number(document.getElementById('cx-f-currentPrice').value) : null,
-      card_image: document.getElementById('cx-f-image').value.trim() || null,
-      cardmarket_url: document.getElementById('cx-f-cardmarketUrl').value.trim() || null,
-      status: status
+      card_name: parsed.name || 'Unnamed card (please update)',
+      set: parsed.set || null,
+      condition: parsed.condition || null,
+      cardmarket_url: url,
+      status: status,
+      current_price: price
     };
     if (status === 'Holding') {
-      fields.buy_price = document.getElementById('cx-f-buyPrice').value ? Number(document.getElementById('cx-f-buyPrice').value) : 0;
-      fields.buy_date = document.getElementById('cx-f-buyDate').value || null;
+      fields.buy_price = price;
+      fields.buy_date = today;
     }
     if (status === 'Sold') {
-      fields.sell_price = document.getElementById('cx-f-sellPrice').value ? Number(document.getElementById('cx-f-sellPrice').value) : null;
-      fields.sell_date = document.getElementById('cx-f-sellDate').value || null;
+      fields.sell_price = price;
+      fields.sell_date = today;
     }
     insertCard(fields).then(function () {
       closeForm();

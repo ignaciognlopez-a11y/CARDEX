@@ -38,11 +38,18 @@
     .sm-sub.pos { color:var(--green); } .sm-sub.neg { color:var(--red); }
 
     /* FILTROS */
-    .filters-bar { display:flex; gap:10px; align-items:center; margin-bottom:14px; flex-wrap:wrap; background:rgba(20,20,20,0.7); border:1px solid rgba(184,145,46,0.22); border-radius:10px; padding:10px 12px; }
-    .filters-bar label { font-size:10px; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); font-weight:700; margin-right:4px; }
-    .filters-bar select, .filters-bar input[type=date] { background:rgba(255,255,255,0.05); border:1px solid rgba(184,145,46,0.25); border-radius:7px; padding:6px 8px; color:var(--text); font-size:12px; font-family:inherit; }
-    .filters-bar .filt-group { display:flex; align-items:center; gap:4px; }
-    .filters-bar .filt-reset { margin-left:auto; font-size:11px; color:var(--gold); background:none; border:none; cursor:pointer; text-decoration:underline; }
+    .filters-toggle-wrap { margin-bottom:14px; position:relative; }
+    .filters-tab { font-size:12px; font-weight:700; padding:7px 16px; border-radius:8px; border:1px solid rgba(184,145,46,0.32); background:rgba(10,10,10,0.6); color:var(--text); cursor:pointer; transition:all 0.15s; }
+    .filters-tab:hover { border-color:rgba(184,145,46,0.6); background:rgba(20,20,20,0.8); }
+    .filters-tab.open { background:var(--orange); border-color:var(--orange); color:#000; }
+    .filters-panel { display:none; margin-top:8px; background:rgba(16,16,16,0.92); border:1px solid rgba(184,145,46,0.28); border-radius:12px; padding:14px 16px; backdrop-filter:blur(20px); box-shadow:0 12px 32px rgba(0,0,0,0.6); max-width:520px; }
+    .filters-panel.open { display:block; }
+    .fp-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
+    .fp-row:last-of-type { margin-bottom:0; }
+    .fp-label { font-size:10px; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); font-weight:700; width:82px; flex-shrink:0; }
+    .fp-to { font-size:11px; color:var(--text-muted); }
+    .filters-panel select, .filters-panel input[type=date] { background:rgba(255,255,255,0.05); border:1px solid rgba(184,145,46,0.25); border-radius:7px; padding:6px 8px; color:var(--text); font-size:12px; font-family:inherit; }
+    .filt-reset { margin-top:4px; font-size:11px; color:var(--gold); background:none; border:none; cursor:pointer; text-decoration:underline; padding:0; }
 
     .view-toggle { display:flex; gap:6px; margin-bottom:14px; }
     .view-toggle-btn { font-size:12px; font-weight:700; padding:6px 14px; border-radius:7px; border:1px solid rgba(184,145,46,0.28); background:rgba(10,10,10,0.55); color:var(--text-muted); cursor:pointer; transition:all 0.15s; display:flex; align-items:center; gap:6px; }
@@ -176,18 +183,40 @@
     <div class="summary-metric" title="Change in value of your paid positions compared to what you paid for them."><span class="sm-label">P&amp;L</span><span class="sm-value" id="s-pnl">—</span><span class="sm-sub" id="s-pct">—</span></div>
   </div>
 
-  <div class="filters-bar">
-    <div class="filt-group"><label>Set</label>
-      <select id="filt-set"><option value="">All</option></select>
+  <div class="filters-toggle-wrap">
+    <button class="filters-tab" id="filters-tab">Filters ▾</button>
+    <div class="filters-panel" id="filters-panel">
+      <div class="fp-row">
+        <span class="fp-label">View</span>
+        <div class="view-toggle" style="margin-bottom:0;">
+          <button class="view-toggle-btn active" data-view="grid" id="view-btn-grid">▦ Grid</button>
+          <button class="view-toggle-btn" data-view="list" id="view-btn-list">☰ List</button>
+        </div>
+      </div>
+      <div class="fp-row">
+        <span class="fp-label">Singles sort</span>
+        <div class="filter-group" id="singles-filters" style="margin-left:0;">
+          <button class="filter-btn active" data-sort="gainers" data-target="singles">% Gainers</button>
+          <button class="filter-btn" data-sort="value" data-target="singles">Highest Value</button>
+        </div>
+      </div>
+      <div class="fp-row">
+        <span class="fp-label">Sealed sort</span>
+        <div class="filter-group" id="sealed-filters" style="margin-left:0;">
+          <button class="filter-btn active" data-sort="gainers" data-target="sealed">% Gainers</button>
+          <button class="filter-btn" data-sort="value" data-target="sealed">Highest Value</button>
+        </div>
+      </div>
+      <div class="fp-row">
+        <span class="fp-label">Set</span>
+        <select id="filt-set"><option value="">All</option></select>
+      </div>
+      <div class="fp-row">
+        <span class="fp-label">Bought</span>
+        <input type="date" id="filt-date-from"/><span class="fp-to">to</span><input type="date" id="filt-date-to"/>
+      </div>
+      <button class="filt-reset" id="filt-reset">Clear filters</button>
     </div>
-    <div class="filt-group"><label>Bought from</label><input type="date" id="filt-date-from"/></div>
-    <div class="filt-group"><label>to</label><input type="date" id="filt-date-to"/></div>
-    <button class="filt-reset" id="filt-reset">Clear filters</button>
-  </div>
-
-  <div class="view-toggle">
-    <button class="view-toggle-btn active" data-view="grid" id="view-btn-grid">▦ Grid view</button>
-    <button class="view-toggle-btn" data-view="list" id="view-btn-list">☰ List view</button>
   </div>
 
   <div class="section-wrap" id="holding-table-section" style="display:none;">
@@ -222,10 +251,6 @@
       <span class="section-collapse-arrow">▾</span>
       <h2>Singles</h2>
       <span class="section-count" id="singles-count"></span>
-      <div class="filter-group" id="singles-filters">
-        <button class="filter-btn active" data-sort="gainers" data-target="singles">% Gainers</button>
-        <button class="filter-btn" data-sort="value" data-target="singles">Highest Value</button>
-      </div>
     </div>
     <div class="section-body"><div class="card-grid" id="singles-grid"></div></div>
   </div>
@@ -235,10 +260,6 @@
       <span class="section-collapse-arrow">▾</span>
       <h2>Sealed</h2>
       <span class="section-count" id="sealed-count"></span>
-      <div class="filter-group" id="sealed-filters">
-        <button class="filter-btn active" data-sort="gainers" data-target="sealed">% Gainers</button>
-        <button class="filter-btn" data-sort="value" data-target="sealed">Highest Value</button>
-      </div>
     </div>
     <div class="section-body"><div class="card-grid" id="sealed-grid"></div></div>
   </div>
@@ -622,6 +643,11 @@
     // Colapsar/expandir secciones
     document.getElementById('singles-toggle').addEventListener('click',()=>document.getElementById('singles-section').classList.toggle('collapsed'));
     document.getElementById('sealed-toggle').addEventListener('click',()=>document.getElementById('sealed-section').classList.toggle('collapsed'));
+
+    document.getElementById('filters-tab').addEventListener('click', ()=>{
+      document.getElementById('filters-tab').classList.toggle('open');
+      document.getElementById('filters-panel').classList.toggle('open');
+    });
 
     // Filtros de set / fecha
     document.getElementById('filt-set').addEventListener('change', e=>{ filterSet=e.target.value; renderAll(); });
