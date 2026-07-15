@@ -81,7 +81,7 @@
     .holding-table tbody tr:last-child { border-bottom:none; }
     .holding-table td { padding:6px 8px; color:var(--text); white-space:nowrap; }
     .holding-table td.ht-name { font-weight:700; min-width:120px; display:flex; align-items:center; gap:6px; white-space:normal; }
-    .holding-table td.ht-name img { width:22px; height:22px; border-radius:4px; object-fit:cover; object-position:top; flex-shrink:0; }
+    .holding-table td.ht-name img { width:22px; height:22px; border-radius:4px; object-fit:contain; object-position:center; background:#050505; flex-shrink:0; }
     .holding-table td.ht-num { text-align:right; font-variant-numeric:tabular-nums; }
     .holding-table td.ht-link { text-align:center; }
     .holding-table td.ht-link a { color:var(--gold); text-decoration:none; font-size:13px; }
@@ -110,7 +110,7 @@
     .pnl-row { display:flex; align-items:center; gap:10px; padding:8px 20px; transition:background 0.1s; }
     .pnl-row:hover { background:rgba(20,20,20,0.85); }
     .pnl-rank { font-size:10px; color:var(--text-muted); width:16px; text-align:right; flex-shrink:0; }
-    .pnl-img { width:32px; height:32px; border-radius:4px; object-fit:cover; object-position:top; flex-shrink:0; }
+    .pnl-img { width:32px; height:32px; border-radius:4px; object-fit:contain; object-position:center; background:#050505; flex-shrink:0; }
     .pnl-name { font-size:12px; font-weight:600; color:var(--text); flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .pnl-date { font-size:11px; color:rgba(255,255,255,0.4); flex-shrink:0; min-width:48px; text-align:right; }
     .pnl-current { font-size:12px; font-weight:600; color:rgba(255,255,255,0.65); flex-shrink:0; min-width:64px; text-align:right; }
@@ -122,7 +122,7 @@
     /* SIMPLE BREAKDOWN (Total Value / Total Invested) */
     .simple-row { display:flex; align-items:center; gap:10px; padding:8px 20px; transition:background 0.1s; }
     .simple-row:hover { background:rgba(20,20,20,0.85); }
-    .simple-img { width:32px; height:32px; border-radius:4px; object-fit:cover; object-position:top; flex-shrink:0; }
+    .simple-img { width:32px; height:32px; border-radius:4px; object-fit:contain; object-position:center; background:#050505; flex-shrink:0; }
     .simple-name { font-size:12px; font-weight:600; color:var(--text); flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .simple-price { font-size:12px; font-weight:700; color:var(--text); flex-shrink:0; min-width:70px; text-align:right; }
     .simple-price.free { color:rgba(255,255,255,0.35); font-weight:600; }
@@ -136,7 +136,7 @@
     .wl-carousel-inner { display:flex; gap:12px; }
     .wl-img-slide { flex:0 0 auto; width:80px; display:flex; flex-direction:column; align-items:center; gap:4px; text-decoration:none; cursor:pointer; padding:4px; border-radius:8px; transition:transform 0.18s, box-shadow 0.18s, background 0.18s; }
     .wl-img-slide:hover { transform:scale(1.08); background:rgba(184,145,46,0.10); box-shadow:0 0 18px rgba(184,145,46,0.35); }
-    .wl-img-slide img { width:80px; height:80px; border-radius:5px; object-fit:cover; display:block; pointer-events:none; }
+    .wl-img-slide img { width:80px; height:80px; border-radius:5px; object-fit:contain; display:block; pointer-events:none; background:#050505; }
     .wl-slide-price { font-size:11px; font-weight:700; color:var(--text); white-space:nowrap; }
     .wl-slide-pct { font-size:10px; font-weight:700; white-space:nowrap; display:flex; align-items:center; gap:2px; }
     .wl-slide-pct.pos { color:var(--green); } .wl-slide-pct.neg { color:var(--red); } .wl-slide-pct.neu { color:var(--text-muted); }
@@ -158,7 +158,7 @@
     .month-row.open .month-detail { max-height:1400px; }
     .month-card-row { display:flex; align-items:center; gap:10px; padding:7px 12px 7px 32px; }
     .month-card-row:hover { background:rgba(255,255,255,0.03); }
-    .month-card-img { width:26px; height:26px; border-radius:4px; object-fit:cover; object-position:top; flex-shrink:0; }
+    .month-card-img { width:26px; height:26px; border-radius:4px; object-fit:contain; object-position:center; background:#050505; flex-shrink:0; }
     .month-card-name { font-size:12px; font-weight:600; color:var(--text); flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .month-card-date { font-size:11px; color:rgba(255,255,255,0.4); flex-shrink:0; min-width:46px; text-align:right; }
     .month-card-buy { font-size:12px; font-weight:600; color:rgba(255,255,255,0.65); flex-shrink:0; min-width:62px; text-align:right; }

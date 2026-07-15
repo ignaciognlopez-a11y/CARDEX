@@ -197,7 +197,7 @@
     .list-row.dragging { opacity: 0.4; }
     .list-row.drag-over { border-color: #b8912e; }
     .list-rank { font-size: 11px; font-weight: 700; color: var(--text-muted); width: 20px; text-align: center; flex-shrink: 0; }
-    .list-img { width: 36px; height: 36px; border-radius: 5px; object-fit: cover; object-position: top; flex-shrink: 0; }
+    .list-img { width: 36px; height: 36px; border-radius: 5px; object-fit: contain; object-position: center; background:#050505; flex-shrink: 0; }
     .list-name { font-size: 13px; font-weight: 700; color: var(--text); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .list-set { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
     .list-sales { font-size: 10px; color: var(--text-muted); flex-shrink: 0; white-space: nowrap; }
@@ -283,7 +283,6 @@
       <div class="modal-actions">
         <a class="btn-cardmarket" id="modal-cm-link" href="#" target="_blank" rel="noopener">↗ Cardmarket</a>
         <button class="btn-edit" id="modal-edit-btn" style="flex:0 0 auto;padding:9px 16px;border-radius:8px;background:transparent;color:var(--gold);border:1px solid rgba(184,145,46,0.4);font-size:12px;font-weight:700;cursor:pointer;">Mover / editar</button>
-        <button class="btn-close" id="modal-close-btn">Close</button>
       </div>
     </div>
   </div>
@@ -480,7 +479,6 @@
     if (ov._stopTilt) { ov._stopTilt(); ov._stopTilt = null; }
   }
   document.getElementById('modal-close-x').addEventListener('click', closeModal);
-  document.getElementById('modal-close-btn').addEventListener('click', closeModal);
   document.getElementById('modal-edit-btn').addEventListener('click', () => { if (currentModalItem) window.CardexOpenMove(currentModalItem); });
   document.getElementById('modal-overlay').addEventListener('click', e => { if (e.target.id==='modal-overlay') closeModal(); });
   document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); });
@@ -562,7 +560,7 @@
     const main = document.getElementById('main-content');
 
     if (!wl.length) {
-      main.innerHTML = '<div class="empty-state"><div class="empty-icon">👁</div><div class="empty-title">Watchlist vacía</div></div>';
+      main.innerHTML = '<div class="empty-state"><div class="empty-icon">👁</div><div class="empty-title">Watchlist is empty</div></div>';
       return;
     }
 
@@ -653,14 +651,14 @@
       return '<div class="section-header' + (i>0 ? ' section-header-spaced' : '') + '">'
         + '<h2>' + g.label + '</h2>'
         + '<span class="section-count">' + g.items.length + ' items</span>'
-        + '<span class="drag-hint" id="drag-hint-' + g.id + '">✦ arrastra para reordenar</span>'
+        + '<span class="drag-hint" id="drag-hint-' + g.id + '">✦ drag to reorder</span>'
         + '<div class="filter-group">'
         + '<button class="filter-btn" data-group="' + g.id + '" data-sort="gainers">% Gainers</button>'
         + '<button class="filter-btn active" data-group="' + g.id + '" data-sort="value">Price ↑</button>'
         + '<button class="filter-btn" data-group="' + g.id + '" data-sort="custom">Custom ⠿</button>'
         + '<span style="width:1px;background:var(--border);height:20px;margin:0 4px"></span>'
-        + '<button class="view-btn active" data-group="' + g.id + '" data-view="grid" title="Vista tarjetas">⊞</button>'
-        + '<button class="view-btn" data-group="' + g.id + '" data-view="list" title="Vista lista">≡</button>'
+        + '<button class="view-btn active" data-group="' + g.id + '" data-view="grid" title="Grid view">⊞</button>'
+        + '<button class="view-btn" data-group="' + g.id + '" data-view="list" title="List view">≡</button>'
         + '</div>'
         + '</div>'
         + '<div class="card-grid" id="wl-grid-' + g.id + '"></div>'

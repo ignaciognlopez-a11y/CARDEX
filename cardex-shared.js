@@ -76,10 +76,10 @@
   function isUnlocked() { return sessionStorage.getItem('cardex_unlocked') === '1'; }
   function requirePassword(cb) {
     if (isUnlocked()) { cb(); return; }
-    const pw = window.prompt('Introduce la contraseña para añadir/editar/mover cartas:');
+    const pw = window.prompt('Enter the password to add/edit/move cards:');
     if (pw === null) return;
     if (pw === APP_PASSWORD) { sessionStorage.setItem('cardex_unlocked', '1'); cb(); }
-    else window.alert('Contraseña incorrecta.');
+    else window.alert('Incorrect password.');
   }
 
   // ---------- CRUD contra Supabase (REST) ----------
@@ -176,7 +176,7 @@
       '<div class="cx-side-panel">' +
         '<div class="cx-side-logo">CARDEX</div>' +
         links +
-        '<button class="cx-side-add" id="cx-open-add">+ Añadir carta</button>' +
+        '<button class="cx-side-add" id="cx-open-add">+ Add card</button>' +
       '</div>';
     document.body.appendChild(overlay);
     overlay.addEventListener('click', function (e) { if (e.target.id === 'cx-side-overlay') closeMenu(); });
@@ -186,10 +186,16 @@
       const burger = document.createElement('button');
       burger.className = 'cx-burger';
       burger.id = 'cx-burger';
-      burger.setAttribute('aria-label', 'Menú');
+      burger.setAttribute('aria-label', 'Menu');
       burger.innerHTML = '<span></span><span></span><span></span>';
       header.insertBefore(burger, header.firstChild);
       burger.addEventListener('click', openMenu);
+
+      const logo = header.querySelector('.logo-text');
+      if (logo) {
+        logo.style.cursor = 'pointer';
+        logo.addEventListener('click', function () { window.location.href = 'index.html'; });
+      }
     }
     document.getElementById('cx-open-add').addEventListener('click', function () {
       closeMenu();
@@ -248,13 +254,13 @@
     let status = prefillStatus || 'Holding';
     function render() {
       openForm(
-        '<div class="cx-form-title">Añadir carta</div>' +
+        '<div class="cx-form-title">Add card</div>' +
         '<div class="cx-form-status-tabs" id="cx-add-tabs">' +
         ['Holding', 'Watchlist', 'Sold'].map(function (s) {
           return '<div class="cx-status-tab' + (s === status ? ' active' : '') + '" data-status="' + s + '">' + s + '</div>';
         }).join('') +
         '</div>' +
-        '<div class="cx-form-row"><label>Nombre de la carta (exacto, como en Cardmarket)</label><input type="text" id="cx-f-name"/></div>' +
+        '<div class="cx-form-row"><label>Card name (exact, as shown on Cardmarket)</label><input type="text" id="cx-f-name"/></div>' +
         '<div class="cx-form-grid2">' +
         '<div class="cx-form-row"><label>Set</label><select id="cx-f-set">' + optionsHtml(SET_OPTIONS, '') + '</select></div>' +
         '<div class="cx-form-row"><label>Rarity</label><select id="cx-f-rarity">' + optionsHtml(RARITY_OPTIONS, '') + '</select></div>' +
@@ -269,8 +275,8 @@
         '<div id="cx-add-status-fields">' + statusFieldsHtml(status) + '</div>' +
         '<div class="cx-form-error" id="cx-form-error"></div>' +
         '<div class="cx-form-actions">' +
-        '<button class="cx-btn cx-btn-ghost" id="cx-form-cancel">Cancelar</button>' +
-        '<button class="cx-btn cx-btn-primary" id="cx-form-save">Guardar</button>' +
+        '<button class="cx-btn cx-btn-ghost" id="cx-form-cancel">Cancel</button>' +
+        '<button class="cx-btn cx-btn-primary" id="cx-form-save">Save</button>' +
         '</div>'
       );
       document.querySelectorAll('#cx-add-tabs .cx-status-tab').forEach(function (t) {
@@ -285,7 +291,7 @@
   function submitAdd(status) {
     const name = document.getElementById('cx-f-name').value.trim();
     const errEl = document.getElementById('cx-form-error');
-    if (!name) { errEl.textContent = 'El nombre de la carta es obligatorio.'; errEl.style.display = 'block'; return; }
+    if (!name) { errEl.textContent = 'The card name is required.'; errEl.style.display = 'block'; return; }
     const fields = {
       card_name: name,
       set: document.getElementById('cx-f-set').value || null,
@@ -312,7 +318,7 @@
       if (typeof window.CardexOnDataChange === 'function') window.CardexOnDataChange();
       else window.location.reload();
     }).catch(function (err) {
-      errEl.textContent = 'Error al guardar: ' + err.message;
+      errEl.textContent = 'Error saving: ' + err.message;
       errEl.style.display = 'block';
     });
   }
@@ -321,7 +327,7 @@
     let targetStatus = item.status;
     function render() {
       openForm(
-        '<div class="cx-form-title">Mover / editar «' + item.name + '»</div>' +
+        '<div class="cx-form-title">Move / edit «' + item.name + '»</div>' +
         '<div class="cx-move-row" id="cx-move-tabs">' +
         ['Holding', 'Watchlist', 'Sold'].map(function (s) {
           return '<div class="cx-move-btn' + (s === targetStatus ? ' current' : '') + '" data-status="' + s + '">' + s + '</div>';
@@ -330,9 +336,9 @@
         '<div id="cx-move-status-fields">' + statusFieldsHtml(targetStatus, item) + '</div>' +
         '<div class="cx-form-error" id="cx-form-error"></div>' +
         '<div class="cx-form-actions">' +
-        '<button class="cx-btn cx-btn-danger" id="cx-form-delete">Borrar</button>' +
-        '<button class="cx-btn cx-btn-ghost" id="cx-form-cancel">Cancelar</button>' +
-        '<button class="cx-btn cx-btn-primary" id="cx-form-save">Guardar</button>' +
+        '<button class="cx-btn cx-btn-danger" id="cx-form-delete">Delete</button>' +
+        '<button class="cx-btn cx-btn-ghost" id="cx-form-cancel">Cancel</button>' +
+        '<button class="cx-btn cx-btn-primary" id="cx-form-save">Save</button>' +
         '</div>'
       );
       document.querySelectorAll('#cx-move-tabs .cx-move-btn').forEach(function (b) {
@@ -365,13 +371,13 @@
       if (typeof window.CardexOnDataChange === 'function') window.CardexOnDataChange();
       else window.location.reload();
     }).catch(function (err) {
-      errEl.textContent = 'Error al guardar: ' + err.message;
+      errEl.textContent = 'Error saving: ' + err.message;
       errEl.style.display = 'block';
     });
   }
 
   function submitDelete(item) {
-    if (!window.confirm('¿Seguro que quieres borrar «' + item.name + '»? Esta acción no se puede deshacer.')) return;
+    if (!window.confirm('Are you sure you want to delete «' + item.name + '»? This action cannot be undone.')) return;
     deleteCard(item.dbId).then(function () {
       closeForm();
       return window.CardexReload();
@@ -380,7 +386,7 @@
       else window.location.reload();
     }).catch(function (err) {
       const errEl = document.getElementById('cx-form-error');
-      errEl.textContent = 'Error al borrar: ' + err.message;
+      errEl.textContent = 'Error deleting: ' + err.message;
       errEl.style.display = 'block';
     });
   }

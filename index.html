@@ -58,17 +58,17 @@
     /* WATCHLIST STRIP */
     .wl-strip { margin-bottom:0; background:rgba(20,20,20,0.78); border:1px solid rgba(184,145,46,0.29); border-radius:var(--radius); padding:12px 16px; backdrop-filter:blur(20px); box-shadow:0 6px 24px rgba(0,0,0,0.55),0 0 0 1px rgba(255,255,255,0.04),inset 0 1px 0 rgba(255,255,255,0.06); }
     .wl-strip-label { font-size:10px; text-transform:uppercase; letter-spacing:0.1em; color:rgba(255,255,255,0.7); font-weight:700; margin-bottom:10px; display:flex; justify-content:space-between; }
-    .wl-carousel-wrap { overflow-x:auto; overflow-y:hidden; height:130px; cursor:grab; -webkit-overflow-scrolling:touch; scrollbar-width:none; -ms-overflow-style:none; }
+    .wl-carousel-wrap { overflow-x:auto; overflow-y:hidden; height:158px; cursor:grab; -webkit-overflow-scrolling:touch; scrollbar-width:none; -ms-overflow-style:none; display:flex; align-items:center; }
     .wl-carousel-wrap::-webkit-scrollbar { display:none; }
     .wl-carousel-wrap:active { cursor:grabbing; }
-    .wl-carousel-inner { display:flex; gap:12px; }
-    .wl-img-slide { flex:0 0 auto; width:80px; display:flex; flex-direction:column; align-items:center; gap:4px; text-decoration:none; cursor:pointer; padding:4px; border-radius:8px; transition:transform 0.18s, box-shadow 0.18s, background 0.18s; }
+    .wl-carousel-inner { display:flex; gap:12px; align-items:center; }
+    .wl-img-slide { flex:0 0 auto; width:80px; display:flex; flex-direction:column; align-items:center; gap:5px; text-decoration:none; cursor:pointer; padding:8px 4px; border-radius:8px; transition:transform 0.18s, box-shadow 0.18s, background 0.18s; }
     .wl-img-slide:hover { transform:scale(1.08); background:rgba(184,145,46,0.10); box-shadow:0 0 18px rgba(184,145,46,0.35); }
-    .wl-img-slide img { width:80px; height:80px; border-radius:5px; object-fit:cover; display:block; pointer-events:none; }
+    .wl-img-slide img { width:80px; height:80px; border-radius:5px; object-fit:contain; display:block; pointer-events:none; background:#050505; flex-shrink:0; }
     .wl-slide-price { font-size:11px; font-weight:700; color:var(--text); white-space:nowrap; }
     .wl-slide-pct { font-size:10px; font-weight:700; white-space:nowrap; display:flex; align-items:center; gap:2px; }
     .wl-slide-pct.pos { color:var(--green); } .wl-slide-pct.neg { color:var(--red); } .wl-slide-pct.neu { color:var(--text-muted); }
-    .wl-slide-name { font-size:9px; color:var(--text-muted); text-align:center; width:80px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+    .wl-slide-name { font-size:9.5px; line-height:1.25; color:var(--text-muted); text-align:center; width:80px; overflow:hidden; white-space:normal; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
 
     /* GRID DE PANELES DEL RESUMEN */
     .panel-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin-bottom:14px; }
@@ -79,7 +79,7 @@
 
     .perf-row { display:flex; align-items:center; gap:9px; padding:6px 2px; cursor:pointer; border-radius:7px; transition:background 0.12s; }
     .perf-row:hover { background:rgba(184,145,46,0.08); }
-    .perf-img { width:28px; height:28px; border-radius:4px; object-fit:cover; object-position:top; flex-shrink:0; }
+    .perf-img { width:28px; height:28px; border-radius:4px; object-fit:contain; object-position:center; background:#050505; flex-shrink:0; }
     .perf-name { font-size:12px; font-weight:600; flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .perf-pct { font-size:12px; font-weight:800; flex-shrink:0; }
     .perf-pct.pos { color:var(--green); } .perf-pct.neg { color:var(--red); }
@@ -104,7 +104,7 @@
     @keyframes overlay-in { from{opacity:0;} to{opacity:1;} }
     .modal { background:linear-gradient(160deg,#1a1a1a 0%,#0a0a0a 50%,#000000 100%); border:1px solid rgba(184,145,46,0.29); border-radius:18px; width:min(94vw,960px); max-width:960px; max-height:92vh; overflow-y:auto; overflow-x:hidden; position:relative; box-shadow:0 36px 90px rgba(0,0,0,0.98),0 0 0 1px rgba(184,145,46,0.16),0 0 80px rgba(184,145,46,0.16); animation:modal-in 0.32s cubic-bezier(0.34,1.4,0.64,1) both; }
     @keyframes modal-in { from{opacity:0;transform:scale(0.86) translateY(28px);} to{opacity:1;transform:scale(1) translateY(0);} }
-    .modal-close-x { position:fixed; top:16px; right:16px; width:30px; height:30px; border-radius:50%; background:rgba(10,10,10,0.9); border:1px solid rgba(255,255,255,0.1); cursor:pointer; color:var(--text-muted); font-size:13px; display:flex; align-items:center; justify-content:center; z-index:10; }
+    .modal-close-x { position:absolute; top:16px; right:16px; width:30px; height:30px; border-radius:50%; background:rgba(10,10,10,0.9); border:1px solid rgba(255,255,255,0.1); cursor:pointer; color:var(--text-muted); font-size:13px; display:flex; align-items:center; justify-content:center; z-index:20; }
     .modal-close-x:hover { color:var(--text); border-color:rgba(255,255,255,0.25); }
     .modal-grid { display:grid; grid-template-columns:280px 1fr; gap:0; }
     @media (max-width:720px) { .modal-grid { grid-template-columns:1fr; } }
@@ -129,19 +129,19 @@
     .modal-stat-value.pos { color:var(--green); } .modal-stat-value.neg { color:var(--red); }
     .modal-stat-sub { font-size:11px; font-weight:700; }
     .modal-stat-sub.pos { color:var(--green); } .modal-stat-sub.neg { color:var(--red); }
-    .modal-chart-col { padding:24px 24px 20px; display:flex; flex-direction:column; }
+    .modal-chart-col { padding:24px 24px 20px; display:flex; flex-direction:column; height:100%; }
     .modal-spark-label { font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); font-weight:700; }
     .range-filters { display:flex; gap:4px; }
     .range-btn { font-size:10.5px; font-weight:700; padding:3px 8px; border-radius:6px; border:1px solid rgba(184,145,46,0.24); background:rgba(255,255,255,0.03); color:var(--text-muted); cursor:pointer; }
     .range-btn.active { background:var(--orange); border-color:var(--orange); color:#000; }
-    .modal-chart-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+    .modal-chart-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; padding-right:38px; }
     .chart-price-range { display:flex; justify-content:space-between; font-size:10.5px; color:var(--text-muted); margin-bottom:2px; }
     .chart-price-range .hi { color:var(--green); } .chart-price-range .lo { color:var(--red); }
-    .chart-wrap { position:relative; height:170px; }
+    .chart-wrap { position:relative; flex:1 1 auto; min-height:220px; }
     .chart-wrap canvas { width:100%; height:100%; display:block; }
     .chart-tip { position:absolute; top:4px; background:rgba(10,10,10,0.92); border:1px solid rgba(184,145,46,0.4); border-radius:6px; padding:3px 8px; font-size:11px; font-weight:600; display:none; pointer-events:none; white-space:nowrap; }
     .chart-axis-dates { display:flex; justify-content:space-between; font-size:9.5px; color:rgba(255,255,255,0.35); margin-top:2px; }
-    .modal-spark-empty { height:170px; display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:12px; }
+    .modal-spark-empty { flex:1 1 auto; min-height:220px; display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:12px; }
     .chart-fallback-note { font-size:10px; color:rgba(255,255,255,0.35); margin-top:4px; font-style:italic; }
     .modal-actions { display:flex; gap:8px; margin-top:16px; flex-wrap:wrap; }
     .btn-cardmarket, .btn-ebay { flex:1 1 auto; text-align:center; padding:9px; border-radius:8px; font-size:12px; font-weight:700; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:6px; }
@@ -166,38 +166,38 @@
   <div class="top-row">
     <div class="summary-panel">
       <div class="summary-box">
-        <div class="summary-metric clickable" id="invested-metric" title="Total pagado por las posiciones que están en Holding ahora mismo.">
+        <div class="summary-metric clickable" id="invested-metric" title="Total amount paid for positions currently in Holding. Click to open the Holding page.">
           <span class="sm-label">Total Invested ↗</span>
           <span class="sm-value" id="s-invested">—</span>
           <span class="sm-sub">cost basis</span>
         </div>
-        <div class="summary-metric clickable" id="pnl-metric" title="Cambio de valor de tus posiciones pagadas frente a lo que costaron.">
+        <div class="summary-metric clickable" id="pnl-metric" title="Change in value of your paid positions compared to what you paid for them. Click to open the Holding page.">
           <span class="sm-label">P&amp;L ↗</span>
           <span class="sm-value" id="s-pnl">—</span>
           <span class="sm-sub" id="s-pct">—</span>
         </div>
-        <div class="summary-metric clickable" id="paid-metric" title="Valor de mercado actual solo de las posiciones pagadas.">
+        <div class="summary-metric clickable" id="paid-metric" title="Current market value of only the positions you paid for, excluding free items. Click to open the Holding page.">
           <span class="sm-label">Paid Positions Value ↗</span>
           <span class="sm-value" id="s-paid">—</span>
           <span class="sm-sub">paid items only</span>
         </div>
-        <div class="summary-metric clickable" id="total-metric" title="Valor de mercado actual de todo el Holding, incluidas las gratis.">
+        <div class="summary-metric clickable" id="total-metric" title="Current market value of all Holding items, including free ones. Click to open the Holding page.">
           <span class="sm-label">Total Market Value ↗</span>
           <span class="sm-value" id="s-total">—</span>
           <span class="sm-sub">all positions</span>
         </div>
-        <div class="summary-metric clickable" id="sold-metric" title="Total recibido de ventas ya completadas.">
+        <div class="summary-metric clickable" id="sold-metric" title="Total amount already received from completed sales. Click to open the Sold page.">
           <span class="sm-label">Total Sold ↗</span>
           <span class="sm-value" id="s-sold">—</span>
           <span class="sm-sub" id="s-sold-count">no sales yet</span>
         </div>
-        <div class="summary-metric clickable" id="flow-metric" title="Total Sold menos Total Invested.">
+        <div class="summary-metric clickable" id="flow-metric" title="Total Sold minus Total Invested — how much of your invested capital you've recovered through sales. Click to open the Sold page.">
           <span class="sm-label">Net Capital Recovery ↗</span>
           <span class="sm-value" id="s-flow">—</span>
           <span class="sm-sub" id="s-flow-sub">—</span>
         </div>
       </div>
-      <div class="hobby-total-line">Total hobby spend (cards + supplies): <b id="s-hobby-total">—</b></div>
+      <div class="hobby-total-line" title="Total Invested (Holding) plus everything logged in your supplies/equipment expenses.">Total hobby spend (cards + supplies): <b id="s-hobby-total">—</b></div>
     </div>
 
     <div class="wl-panel">
@@ -211,89 +211,34 @@
   </div>
 
   <div class="stat-strip">
-    <div class="stat-chip"><span class="sc-label">Units in Holding</span><span class="sc-value" id="stat-units">—</span></div>
-    <div class="stat-chip"><span class="sc-label">Singles / Sealed</span><span class="sc-value" id="stat-split">—</span></div>
-    <div class="stat-chip"><span class="sc-label">Sets Represented</span><span class="sc-value" id="stat-sets">—</span></div>
-    <div class="stat-chip"><span class="sc-label">Watchlist Items</span><span class="sc-value" id="stat-watchlist">—</span></div>
+    <div class="stat-chip" title="Number of individual positions currently in Holding (each purchase counts as one unit)."><span class="sc-label">Units in Holding</span><span class="sc-value" id="stat-units">—</span></div>
+    <div class="stat-chip" title="How many Holding items are single cards vs. sealed product."><span class="sc-label">Singles / Sealed</span><span class="sc-value" id="stat-split">—</span></div>
+    <div class="stat-chip" title="Number of distinct sets represented among your Holding items."><span class="sc-label">Sets Represented</span><span class="sc-value" id="stat-sets">—</span></div>
+    <div class="stat-chip" title="Number of items currently on your Watchlist."><span class="sc-label">Watchlist Items</span><span class="sc-value" id="stat-watchlist">—</span></div>
   </div>
 
   <div class="panel-grid">
     <div class="panel">
-      <div class="panel-title"><span>🏆 Top Performers</span><span class="p-sub">% sobre coste</span></div>
+      <div class="panel-title" title="Your paid Holding positions with the best return on cost."><span>🏆 Top Performers</span><span class="p-sub">% on cost</span></div>
       <div id="top-performers"></div>
     </div>
     <div class="panel">
-      <div class="panel-title"><span>📉 Worst Performers</span><span class="p-sub">% sobre coste</span></div>
+      <div class="panel-title" title="Your paid Holding positions with the worst return on cost."><span>📉 Worst Performers</span><span class="p-sub">% on cost</span></div>
       <div id="worst-performers"></div>
     </div>
   </div>
 
   <div class="panel-grid">
     <div class="panel">
-      <div class="panel-title"><span>📦 Distribución por Set</span><span class="p-sub">valor de mercado</span></div>
+      <div class="panel-title" title="Market value and item count of your Holding, grouped by set."><span>📦 Set Distribution</span><span class="p-sub">market value</span></div>
       <div id="set-distribution"></div>
     </div>
     <div class="panel">
-      <div class="panel-title"><span>💎 Items Más Caros</span><span class="p-sub">Current Price</span></div>
+      <div class="panel-title" title="Your Holding items with the highest current market price."><span>💎 Most Expensive Items</span><span class="p-sub">Current Price</span></div>
       <div id="most-expensive"></div>
     </div>
   </div>
 </main>
-
-<div class="pnl-overlay" id="pnl-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.82);backdrop-filter:blur(12px);z-index:200;align-items:center;justify-content:center;">
-  <div class="pnl-modal" style="background:rgba(10,10,10,0.96);border:1px solid rgba(184,145,46,0.29);border-radius:16px;width:460px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column;">
-    <div style="padding:16px 20px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);">
-      <div><div style="font-size:15px;font-weight:800;">P&amp;L</div><div style="display:flex;gap:16px;align-items:baseline;"><span style="font-size:22px;font-weight:800;" id="pnl-total-val">—</span><span style="font-size:12px;font-weight:700;" id="pnl-total-pct"></span></div></div>
-      <button id="pnl-close" style="width:26px;height:26px;border-radius:50%;background:rgba(20,20,20,0.9);border:1px solid rgba(184,145,46,0.24);cursor:pointer;color:var(--text-muted);">✕</button>
-    </div>
-    <div style="overflow-y:auto;padding:8px 0;" id="pnl-list"></div>
-  </div>
-</div>
-<div class="pnl-overlay" id="total-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.82);backdrop-filter:blur(12px);z-index:200;align-items:center;justify-content:center;">
-  <div class="pnl-modal" style="background:rgba(10,10,10,0.96);border:1px solid rgba(184,145,46,0.29);border-radius:16px;width:460px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column;">
-    <div style="padding:16px 20px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);">
-      <div><div style="font-size:15px;font-weight:800;">Total Market Value</div><span style="font-size:22px;font-weight:800;" id="total-total-val">—</span></div>
-      <button id="total-close" style="width:26px;height:26px;border-radius:50%;background:rgba(20,20,20,0.9);border:1px solid rgba(184,145,46,0.24);cursor:pointer;color:var(--text-muted);">✕</button>
-    </div>
-    <div style="overflow-y:auto;padding:8px 0;" id="total-list"></div>
-  </div>
-</div>
-<div class="pnl-overlay" id="sold-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.82);backdrop-filter:blur(12px);z-index:200;align-items:center;justify-content:center;">
-  <div class="pnl-modal" style="background:rgba(10,10,10,0.96);border:1px solid rgba(184,145,46,0.29);border-radius:16px;width:460px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column;">
-    <div style="padding:16px 20px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);">
-      <div><div style="font-size:15px;font-weight:800;">Sold Positions</div><span style="font-size:22px;font-weight:800;" id="sold-total-val">—</span></div>
-      <button id="sold-close" style="width:26px;height:26px;border-radius:50%;background:rgba(20,20,20,0.9);border:1px solid rgba(184,145,46,0.24);cursor:pointer;color:var(--text-muted);">✕</button>
-    </div>
-    <div style="overflow-y:auto;padding:8px 0;" id="sold-list"></div>
-  </div>
-</div>
-<div class="pnl-overlay" id="paid-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.82);backdrop-filter:blur(12px);z-index:200;align-items:center;justify-content:center;">
-  <div class="pnl-modal" style="background:rgba(10,10,10,0.96);border:1px solid rgba(184,145,46,0.29);border-radius:16px;width:460px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column;">
-    <div style="padding:16px 20px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);">
-      <div><div style="font-size:15px;font-weight:800;">Paid Positions Value</div><span style="font-size:22px;font-weight:800;" id="paid-total-val">—</span></div>
-      <button id="paid-close" style="width:26px;height:26px;border-radius:50%;background:rgba(20,20,20,0.9);border:1px solid rgba(184,145,46,0.24);cursor:pointer;color:var(--text-muted);">✕</button>
-    </div>
-    <div style="overflow-y:auto;padding:8px 0;" id="paid-list"></div>
-  </div>
-</div>
-<div class="pnl-overlay" id="flow-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.82);backdrop-filter:blur(12px);z-index:200;align-items:center;justify-content:center;">
-  <div class="pnl-modal" style="background:rgba(10,10,10,0.96);border:1px solid rgba(184,145,46,0.29);border-radius:16px;width:460px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column;">
-    <div style="padding:16px 20px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);">
-      <div><div style="font-size:15px;font-weight:800;">Net Capital Recovery</div><span style="font-size:22px;font-weight:800;" id="flow-total-val">—</span></div>
-      <button id="flow-close" style="width:26px;height:26px;border-radius:50%;background:rgba(20,20,20,0.9);border:1px solid rgba(184,145,46,0.24);cursor:pointer;color:var(--text-muted);">✕</button>
-    </div>
-    <div style="overflow-y:auto;padding:8px 0;" id="flow-list"></div>
-  </div>
-</div>
-<div class="pnl-overlay" id="invested-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.82);backdrop-filter:blur(12px);z-index:200;align-items:center;justify-content:center;">
-  <div class="pnl-modal" style="background:rgba(10,10,10,0.96);border:1px solid rgba(184,145,46,0.29);border-radius:16px;width:460px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column;">
-    <div style="padding:16px 20px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);">
-      <div><div style="font-size:15px;font-weight:800;">Total Invested</div><span style="font-size:22px;font-weight:800;" id="invested-total-val">—</span></div>
-      <button id="invested-close" style="width:26px;height:26px;border-radius:50%;background:rgba(20,20,20,0.9);border:1px solid rgba(184,145,46,0.24);cursor:pointer;color:var(--text-muted);">✕</button>
-    </div>
-    <div style="overflow-y:auto;padding:8px 0;" id="invested-list"></div>
-  </div>
-</div>
 
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal">
@@ -337,7 +282,6 @@
           <a class="btn-cardmarket" id="modal-cm-link" href="#" target="_blank" rel="noopener">Cardmarket ↗</a>
           <a class="btn-ebay" id="modal-ebay-link" href="#" target="_blank" rel="noopener">eBay Sold (US) ↗</a>
           <button class="btn-edit" id="modal-edit-btn">Mover / editar</button>
-          <button class="btn-close" id="modal-close-btn">Close</button>
         </div>
       </div>
     </div>
@@ -387,7 +331,7 @@
     axisEl.innerHTML = labelDates.map(d=>`<span>${df(d)}</span>`).join('');
     noteEl.style.display = usedFallback ? 'block' : 'none';
     if(usedFallback) noteEl.textContent = 'Not enough data points in this range yet — showing full history instead.';
-    requestAnimationFrame(()=>drawSpark('modal-spark', filtered, 300, true));
+    requestAnimationFrame(()=>drawSpark('modal-spark', filtered, null, true));
   }
   function drawSpark(id,history,h,interactive){
     const canvas=document.getElementById(id); if(!canvas)return;
@@ -512,7 +456,6 @@
     ov._stopTilt=()=>{ stage.removeEventListener('mousemove',onMove); stage.removeEventListener('mouseleave',onLeave); cancelAnimationFrame(raf); if(card3d)card3d.style.transform=''; };
   }
   document.getElementById('modal-close-x').addEventListener('click',closeModal);
-  document.getElementById('modal-close-btn').addEventListener('click',closeModal);
   document.getElementById('modal-edit-btn').addEventListener('click',()=>{ if(currentModalItem) window.CardexOpenMove(currentModalItem); });
   document.getElementById('modal-overlay').addEventListener('click',e=>{if(e.target.id==='modal-overlay')closeModal();});
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
@@ -637,8 +580,8 @@
     const withPct = paid.map(c => ({ c, pct: (c.currentPrice-c.buyPrice)/c.buyPrice*100 }));
     const top = [...withPct].sort((a,b)=>b.pct-a.pct).slice(0,5);
     const worst = [...withPct].sort((a,b)=>a.pct-b.pct).slice(0,5).filter(x=>x.pct<0);
-    document.getElementById('top-performers').innerHTML = top.length ? top.map(x=>renderPerfRow(x.c,x.pct)).join('') : '<div class="empty-mini">Aún no hay suficientes datos.</div>';
-    document.getElementById('worst-performers').innerHTML = worst.length ? worst.map(x=>renderPerfRow(x.c,x.pct)).join('') : '<div class="empty-mini">Ninguna posición en negativo ahora mismo 🎉</div>';
+    document.getElementById('top-performers').innerHTML = top.length ? top.map(x=>renderPerfRow(x.c,x.pct)).join('') : '<div class="empty-mini">Not enough data yet.</div>';
+    document.getElementById('worst-performers').innerHTML = worst.length ? worst.map(x=>renderPerfRow(x.c,x.pct)).join('') : '<div class="empty-mini">No positions in the red right now 🎉</div>';
 
     // ── DISTRIBUCIÓN POR SET ──
     const bySet = {};
@@ -656,7 +599,7 @@
         <div class="set-bar-wrap"><div class="set-bar" style="width:${Math.max(4,(d.value/maxSetValue*100)).toFixed(1)}%"></div></div>
         <span class="set-val">${fmt(d.value)}</span>
         <span class="set-qty">${d.qty} uds</span>
-      </div>`).join('') : '<div class="empty-mini">No hay cartas en Holding todavía.</div>';
+      </div>`).join('') : '<div class="empty-mini">No cards in Holding yet.</div>';
 
     // ── ITEMS MÁS CAROS ──
     const priciest = [...holding].sort((a,b)=>b.currentPrice-a.currentPrice).slice(0,6);
@@ -665,74 +608,25 @@
         <img class="perf-img" src="${c.image}" alt="" onerror="this.style.opacity=0.1"/>
         <span class="perf-name">${c.name}</span>
         <span class="perf-pct" style="color:var(--gold)">${fmt(c.currentPrice)}</span>
-      </div>`).join('') : '<div class="empty-mini">No hay cartas en Holding todavía.</div>';
+      </div>`).join('') : '<div class="empty-mini">No cards in Holding yet.</div>';
 
     document.querySelectorAll('.perf-row').forEach(el=>{
       el.addEventListener('click', ()=>{ const item = allCards.find(c=>c.id===el.dataset.id); if(item) openModal(item); });
     });
 
-    // ── MODALES DE DESGLOSE ──
-    function wireBreakdown(metricId, overlayId, closeId, totalValId, listId, rows, valFn, extraCls){
-      document.getElementById(metricId).addEventListener('click', () => {
-        document.getElementById(totalValId).textContent = fmt(rows.reduce((s,r)=>s+valFn(r),0));
-        document.getElementById(listId).innerHTML = rows.length ? [...rows].sort((a,b)=>valFn(b)-valFn(a)).map(r=>`
-          <div style="display:flex;align-items:center;gap:10px;padding:8px 20px;">
-            <img style="width:32px;height:32px;border-radius:4px;object-fit:cover;object-position:top;" src="${r.image}" alt="" onerror="this.style.opacity=0.1"/>
-            <span style="font-size:12px;font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.name}</span>
-            <span style="font-size:12px;font-weight:700;${r.buyPrice===0&&extraCls==='invested'?'color:rgba(255,255,255,0.35);':''}">${(r.buyPrice===0&&extraCls==='invested')?'Free':fmt(valFn(r))}</span>
-          </div>`).join('') : '<div style="color:var(--text-muted);font-size:12px;padding:16px 20px;">Sin datos.</div>';
-        document.getElementById(overlayId).classList.add('open');
-        document.body.style.overflow='hidden';
-      });
-      document.getElementById(closeId).addEventListener('click', ()=>{ document.getElementById(overlayId).classList.remove('open'); document.body.style.overflow=''; });
-      document.getElementById(overlayId).addEventListener('click', e=>{ if(e.target.id===overlayId){ document.getElementById(overlayId).classList.remove('open'); document.body.style.overflow=''; } });
-    }
-    wireBreakdown('total-metric','total-overlay','total-close','total-total-val','total-list', holding, c=>c.currentPrice*(c.qty||1));
-    wireBreakdown('paid-metric','paid-overlay','paid-close','paid-total-val','paid-list', paid, c=>c.currentPrice*(c.qty||1));
-    wireBreakdown('sold-metric','sold-overlay','sold-close','sold-total-val','sold-list', sold, c=>(c.sellPrice||0)*(c.qty||1));
-    wireBreakdown('invested-metric','invested-overlay','invested-close','invested-total-val','invested-list', holding, c=>c.buyPrice*(c.qty||1), 'invested');
-
-    document.getElementById('pnl-metric').addEventListener('click', () => {
-      const rows = paid.map(c => { const qty=c.qty||1; const pnlEur=(c.currentPrice-c.buyPrice)*qty; const pnlPct=(c.currentPrice-c.buyPrice)/c.buyPrice*100; return {...c,pnlEur,pnlPct}; }).sort((a,b)=>b.pnlPct-a.pnlPct);
-      const totalPnl = rows.reduce((s,c)=>s+c.pnlEur,0);
-      const totalInv = paid.reduce((s,c)=>s+c.buyPrice*(c.qty||1),0);
-      const totalPct = totalInv>0 ? totalPnl/totalInv*100 : 0;
-      document.getElementById('pnl-total-val').textContent = fmtSign(totalPnl);
-      document.getElementById('pnl-total-val').style.color = totalPnl>=0?'var(--green)':'var(--red)';
-      document.getElementById('pnl-total-pct').textContent = fmtPct(totalPct)+' on cost';
-      document.getElementById('pnl-total-pct').style.color = totalPnl>=0?'var(--green)':'var(--red)';
-      document.getElementById('pnl-list').innerHTML = rows.map(r=>{
-        const pos=r.pnlEur>=0, sign=pos?'+':'';
-        return `<div style="display:flex;align-items:center;gap:10px;padding:8px 20px;">
-          <img style="width:32px;height:32px;border-radius:4px;object-fit:cover;object-position:top;" src="${r.image}" alt="" onerror="this.style.opacity=0.1"/>
-          <span style="font-size:12px;font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.name}</span>
-          <span style="font-size:12px;font-weight:800;color:${pos?'var(--green)':'var(--red)'}">${sign}${r.pnlPct.toFixed(1)}%</span>
-          <span style="font-size:12px;font-weight:600;min-width:70px;text-align:right;">${sign}${fmt(Math.abs(r.pnlEur))}</span>
-        </div>`;
-      }).join('');
-      document.getElementById('pnl-overlay').classList.add('open');
-      document.body.style.overflow='hidden';
+    // ── CADA MÉTRICA LLEVA A SU PÁGINA CORRESPONDIENTE ──
+    const metricTargets = {
+      'invested-metric': 'holding.html',
+      'pnl-metric': 'holding.html',
+      'paid-metric': 'holding.html',
+      'total-metric': 'holding.html',
+      'sold-metric': 'sold.html',
+      'flow-metric': 'sold.html'
+    };
+    Object.keys(metricTargets).forEach(id=>{
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('click', ()=>{ window.location.href = metricTargets[id]; });
     });
-    document.getElementById('pnl-close').addEventListener('click', ()=>{ document.getElementById('pnl-overlay').classList.remove('open'); document.body.style.overflow=''; });
-    document.getElementById('pnl-overlay').addEventListener('click', e=>{ if(e.target.id==='pnl-overlay'){ document.getElementById('pnl-overlay').classList.remove('open'); document.body.style.overflow=''; } });
-
-    document.getElementById('flow-metric').addEventListener('click', () => {
-      document.getElementById('flow-total-val').textContent = fmtSign(totalFlow);
-      document.getElementById('flow-total-val').style.color = totalFlow>=0?'var(--green)':'var(--red)';
-      const investedRows = paid.map(c => ({ ...c, lineValue: c.buyPrice*(c.qty||1), tag:'Invested', sign:'-', cls:'neg' }));
-      const cashedRows = sold.map(c => ({ ...c, lineValue: (c.sellPrice||0)*(c.qty||1), tag:'Cashed out', sign:'+', cls:'pos' }));
-      const rows = [...investedRows, ...cashedRows].sort((a,b)=>b.lineValue-a.lineValue);
-      document.getElementById('flow-list').innerHTML = rows.map(r=>`
-        <div style="display:flex;align-items:center;gap:10px;padding:8px 20px;">
-          <img style="width:32px;height:32px;border-radius:4px;object-fit:cover;object-position:top;" src="${r.image}" alt="" onerror="this.style.opacity=0.1"/>
-          <span style="font-size:12px;font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.name} <span style="color:var(--text-muted);font-weight:500;">(${r.tag})</span></span>
-          <span style="font-size:12px;font-weight:700;color:${r.cls==='pos'?'var(--green)':'var(--red)'}">${r.sign}${fmt(r.lineValue)}</span>
-        </div>`).join('');
-      document.getElementById('flow-overlay').classList.add('open');
-      document.body.style.overflow='hidden';
-    });
-    document.getElementById('flow-close').addEventListener('click', ()=>{ document.getElementById('flow-overlay').classList.remove('open'); document.body.style.overflow=''; });
-    document.getElementById('flow-overlay').addEventListener('click', e=>{ if(e.target.id==='flow-overlay'){ document.getElementById('flow-overlay').classList.remove('open'); document.body.style.overflow=''; } });
   }
 
   window.CardexOnDataChange = render;
