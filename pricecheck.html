@@ -60,6 +60,19 @@ function getDone() { try { return JSON.parse(localStorage.getItem(DONE_KEY) || '
 function setDone(arr) { localStorage.setItem(DONE_KEY, JSON.stringify(arr)); }
 function markDone(url) { const d = getDone(); if (!d.includes(url)) { d.push(url); setDone(d); } }
 
+// Codificamos los datos que van en el hash de la URL en base64url (solo A-Z a-z 0-9 - _)
+// para que ningún script de la propia Cardmarket se atragante con corchetes/comillas/comas.
+function b64urlEncode(obj) {
+  const json = JSON.stringify(obj);
+  const b64 = btoa(unescape(encodeURIComponent(json)));
+  return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+function b64urlDecode(str) {
+  let b64 = str.replace(/-/g, '+').replace(/_/g, '/');
+  while (b64.length % 4) b64 += '=';
+  return JSON.parse(decodeURIComponent(escape(atob(b64))));
+}
+
 let allRows = [];
 let baselinePrices = null; // precio guardado en la primera carga de esta sesión, por cardmarket_url
 
@@ -156,21 +169,21 @@ document.getElementById('bulk-start').addEventListener('click', () => {
   if (!urls.length) { alert('No cards match the current filter.'); return; }
 
   const queue = urls.map(u => ({ u, i: byUrl[u] }));
-  const backUrl = location.href.split('#')[0] + '#bulkdone=' + encodeURIComponent(JSON.stringify(urls));
+  const backUrl = location.href.split('#')[0] + '#bulkdone=' + b64urlEncode(urls);
   const first = queue[0];
   const rest = queue.slice(1);
   const launchUrl = first.u + '#cdx=' + first.i.join(',') +
-    '&next=' + encodeURIComponent(JSON.stringify(rest)) +
-    '&back=' + encodeURIComponent(backUrl);
+    '&next=' + b64urlEncode(rest) +
+    '&back=' + b64urlEncode(backUrl);
   window.open(launchUrl, '_blank');
 });
 
-// Al volver de una tanda en bloque, el script deja aquí #bulkdone=[...urls...]
+// Al volver de una tanda en bloque, el script deja aquí #bulkdone=<base64url>
 (function handleBulkReturn() {
   const m = location.hash.match(/bulkdone=([^&]+)/);
   if (!m) return;
   try {
-    const urls = JSON.parse(decodeURIComponent(m[1]));
+    const urls = b64urlDecode(m[1]);
     const d = getDone();
     urls.forEach(u => { if (!d.includes(u)) d.push(u); });
     setDone(d);
