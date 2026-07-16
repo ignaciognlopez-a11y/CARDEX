@@ -61,6 +61,13 @@ function getDone() { try { return JSON.parse(localStorage.getItem(DONE_KEY) || '
 function setDone(arr) { localStorage.setItem(DONE_KEY, JSON.stringify(arr)); }
 function markDone(url) { const d = getDone(); if (!d.includes(url)) { d.push(url); setDone(d); } }
 
+// "Comprobada hoy" = de verdad se escribió en Supabase hoy (updated_at), O se marcó a mano.
+// Así "Check Remaining" sabe retomar aunque una tanda en bloque se cortase a mitad.
+function isDoneToday(url, info, today, manualDone) {
+  const updatedToday = info.updatedAt && info.updatedAt.slice(0, 10) === today;
+  return updatedToday || manualDone.includes(url);
+}
+
 // Codificamos los datos que van en el hash de la URL en base64url (solo A-Z a-z 0-9 - _)
 // para que ningún script de la propia Cardmarket se atragante con corchetes/comillas/comas.
 function b64urlEncode(obj) {
@@ -79,7 +86,7 @@ let baselinePrices = null; // precio guardado en la primera carga de esta sesió
 
 async function load() {
   document.getElementById('rows').innerHTML = '<tr><td colspan="6" class="empty">Loading…</td></tr>';
-  const res = await fetch(SUPABASE_URL + "/rest/v1/riftbound_inversiones?select=id,card_name,set,current_price,cardmarket_url,status&order=cardmarket_url", { headers });
+  const res = await fetch(SUPABASE_URL + "/rest/v1/riftbound_inversiones?select=id,card_name,set,current_price,cardmarket_url,status,updated_at&order=cardmarket_url", { headers });
   allRows = await res.json();
   if (!baselinePrices) {
     baselinePrices = {};
@@ -101,14 +108,19 @@ function render() {
   // Agrupar por URL única (varias filas pueden compartir carta)
   const byUrl = {};
   filtered.forEach(r => {
-    if (!byUrl[r.cardmarket_url]) byUrl[r.cardmarket_url] = { name: r.card_name, set: r.set, price: r.current_price, ids: [] };
+    if (!byUrl[r.cardmarket_url]) byUrl[r.cardmarket_url] = { name: r.card_name, set: r.set, price: r.current_price, ids: [], updatedAt: null };
     byUrl[r.cardmarket_url].ids.push(r.id);
+    if (!byUrl[r.cardmarket_url].updatedAt || (r.updated_at && r.updated_at > byUrl[r.cardmarket_url].updatedAt)) {
+      byUrl[r.cardmarket_url].updatedAt = r.updated_at;
+    }
   });
 
-  const done = getDone();
+  const today = new Date().toISOString().slice(0, 10);
+  const manualDone = getDone();
   const entries = Object.entries(byUrl).sort((a,b) => (a[1].name||'').localeCompare(b[1].name||''));
+  const doneCount = entries.filter(([url, info]) => isDoneToday(url, info, today, manualDone)).length;
 
-  document.getElementById('progress').textContent = done.length + ' / ' + entries.length + ' checked today';
+  document.getElementById('progress').textContent = doneCount + ' / ' + entries.length + ' checked today';
 
   if (!entries.length) {
     document.getElementById('rows').innerHTML = '<tr><td colspan="6" class="empty">No cards with a Cardmarket link in the current filter.</td></tr>';
@@ -116,7 +128,7 @@ function render() {
   }
 
   document.getElementById('rows').innerHTML = entries.map(([url, info]) => {
-    const isDone = done.includes(url);
+    const isDone = isDoneToday(url, info, today, manualDone);
     const launchUrl = url + (url.includes('#') ? '' : '#cdx=' + info.ids.join(','));
     const baseline = baselinePrices ? baselinePrices[url] : null;
     const priceTxt = baseline != null ? Number(baseline).toLocaleString('de-DE',{minimumFractionDigits:2}) + ' €' : '—';
@@ -153,7 +165,8 @@ function toggleDone(url) {
 function startBulkCheck(onlyRemaining) {
   const showHolding = document.getElementById('f-holding').checked;
   const showWatchlist = document.getElementById('f-watchlist').checked;
-  const done = getDone();
+  const manualDone = getDone();
+  const today = new Date().toISOString().slice(0, 10);
 
   const filtered = allRows.filter(r =>
     r.cardmarket_url && (
@@ -163,11 +176,14 @@ function startBulkCheck(onlyRemaining) {
   );
   const byUrl = {};
   filtered.forEach(r => {
-    if (!byUrl[r.cardmarket_url]) byUrl[r.cardmarket_url] = { ids: [], name: r.card_name };
+    if (!byUrl[r.cardmarket_url]) byUrl[r.cardmarket_url] = { ids: [], name: r.card_name, updatedAt: null };
     byUrl[r.cardmarket_url].ids.push(r.id);
+    if (!byUrl[r.cardmarket_url].updatedAt || (r.updated_at && r.updated_at > byUrl[r.cardmarket_url].updatedAt)) {
+      byUrl[r.cardmarket_url].updatedAt = r.updated_at;
+    }
   });
   let urls = Object.keys(byUrl).sort((a, b) => (byUrl[a].name || '').localeCompare(byUrl[b].name || ''));
-  if (onlyRemaining) urls = urls.filter(u => !done.includes(u));
+  if (onlyRemaining) urls = urls.filter(u => !isDoneToday(u, byUrl[u], today, manualDone));
 
   if (!urls.length) { alert(onlyRemaining ? 'Nothing left to check today with the current filter.' : 'No cards match the current filter.'); return; }
 
