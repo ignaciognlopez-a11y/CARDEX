@@ -161,14 +161,14 @@ document.getElementById('bulk-start').addEventListener('click', () => {
   );
   const byUrl = {};
   filtered.forEach(r => {
-    if (!byUrl[r.cardmarket_url]) byUrl[r.cardmarket_url] = [];
-    byUrl[r.cardmarket_url].push(r.id);
+    if (!byUrl[r.cardmarket_url]) byUrl[r.cardmarket_url] = { ids: [], name: r.card_name };
+    byUrl[r.cardmarket_url].ids.push(r.id);
   });
-  const urls = Object.keys(byUrl);
+  const urls = Object.keys(byUrl).sort((a, b) => (byUrl[a].name || '').localeCompare(byUrl[b].name || ''));
 
   if (!urls.length) { alert('No cards match the current filter.'); return; }
 
-  const queue = urls.map(u => ({ u, i: byUrl[u] }));
+  const queue = urls.map(u => ({ u, i: byUrl[u].ids }));
   const backUrl = location.href.split('#')[0] + '#bulkdone=' + b64urlEncode(urls);
   const first = queue[0];
   const rest = queue.slice(1);
