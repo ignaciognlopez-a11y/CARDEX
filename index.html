@@ -179,22 +179,22 @@
   <div class="top-row">
     <div class="summary-panel">
       <div class="summary-box">
-        <div class="summary-metric clickable" id="invested-metric" title="Total amount paid for positions currently in Holding. Click to open the Holding page.">
+        <div class="summary-metric clickable" id="invested-metric" title="Total amount paid for positions currently in My Collection. Click to open the My Collection page.">
           <span class="sm-label">Total Invested ↗</span>
           <span class="sm-value" id="s-invested">—</span>
           <span class="sm-sub">cost basis</span>
         </div>
-        <div class="summary-metric clickable" id="pnl-metric" title="Change in value of your paid positions compared to what you paid for them. Click to open the Holding page.">
+        <div class="summary-metric clickable" id="pnl-metric" title="Change in value of your paid positions compared to what you paid for them. Click to open the My Collection page.">
           <span class="sm-label">P&amp;L ↗</span>
           <span class="sm-value" id="s-pnl">—</span>
           <span class="sm-sub" id="s-pct">—</span>
         </div>
-        <div class="summary-metric clickable" id="paid-metric" title="Current market value of only the positions you paid for, excluding free items. Click to open the Holding page.">
+        <div class="summary-metric clickable" id="paid-metric" title="Current market value of only the positions you paid for, excluding free items. Click to open the My Collection page.">
           <span class="sm-label">Paid Positions Value ↗</span>
           <span class="sm-value" id="s-paid">—</span>
           <span class="sm-sub">paid items only</span>
         </div>
-        <div class="summary-metric clickable" id="total-metric" title="Current market value of all Holding items, including free ones. Click to open the Holding page.">
+        <div class="summary-metric clickable" id="total-metric" title="Current market value of all My Collection items, including free ones. Click to open the My Collection page.">
           <span class="sm-label">Total Market Value ↗</span>
           <span class="sm-value" id="s-total">—</span>
           <span class="sm-sub">all positions</span>
@@ -210,12 +210,12 @@
           <span class="sm-sub" id="s-flow-sub">—</span>
         </div>
       </div>
-      <div class="hobby-total-line" title="Total Invested (Holding) plus everything logged in your supplies/equipment expenses.">Total hobby spend (cards + supplies): <b id="s-hobby-total">—</b></div>
+      <div class="hobby-total-line" title="Total Invested (My Collection) plus everything logged in your supplies/equipment expenses.">Total hobby spend (cards + supplies): <b id="s-hobby-total">—</b></div>
     </div>
 
     <div class="wl-panel">
       <div class="panel" style="width:100%;">
-        <div class="panel-title" title="Market value and item count of your Holding, grouped by set.">
+        <div class="panel-title" title="Market value and item count of your My Collection, grouped by set.">
           <span class="p-main">Set Distribution</span><span class="p-sub">market value</span>
         </div>
         <div id="set-distribution"></div>
@@ -226,7 +226,7 @@
   <div class="carousel-row">
     <div class="carousel-col">
       <div class="wl-strip">
-        <div class="wl-strip-label"><span class="p-main">Holding</span><span class="p-sub" id="holding-count-label"></span></div>
+        <div class="wl-strip-label"><span class="p-main">My Collection</span><span class="p-sub" id="holding-count-label"></span></div>
         <div class="wl-carousel-wrap" id="holding-carousel">
           <div class="wl-carousel-inner" id="holding-inner"></div>
         </div>
@@ -244,7 +244,7 @@
 
   <div class="panel-grid">
     <div class="panel">
-      <div class="panel-title" title="Your paid Holding positions with the best return, ranked by percentage or by total euros.">
+      <div class="panel-title" title="Your paid My Collection positions with the best return, ranked by percentage or by total euros.">
         <span class="p-main">Top Performers</span>
         <div class="p-by">
           <span class="p-by-label">by:</span>
@@ -618,7 +618,7 @@
     const upd=window.portfolioData.updatedAt;
     if(upd)document.getElementById('updated-label').textContent='Updated '+new Date(upd+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
 
-    initCarousel(holding, 'holding-carousel', 'holding-inner', 'No cards in Holding yet');
+    initCarousel(holding, 'holding-carousel', 'holding-inner', 'No cards in My Collection yet');
     initCarousel(watchlist, 'wl-carousel', 'wl-inner', 'No watchlist items yet');
     document.getElementById('holding-count-label').textContent = holding.length + (holding.length===1?' item':' items');
     document.getElementById('wl-count-label').textContent = watchlist.length + (watchlist.length===1?' item':' items');
@@ -649,7 +649,7 @@
         <div class="set-bar-wrap"><div class="set-bar" style="width:${Math.max(4,(d.value/maxSetValue*100)).toFixed(1)}%"></div></div>
         <span class="set-val">${fmt(d.value)}</span>
         <span class="set-qty">${d.qty} uds</span>
-      </div>`).join('') : '<div class="empty-mini">No cards in Holding yet.</div>';
+      </div>`).join('') : '<div class="empty-mini">No cards in My Collection yet.</div>';
 
     document.querySelectorAll('#watchlist-decreases .perf-row').forEach(el=>{
       el.addEventListener('click', ()=>{ const item = allCards.find(c=>c.id===el.dataset.id); if(item) openModal(item); });
