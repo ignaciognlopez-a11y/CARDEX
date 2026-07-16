@@ -157,7 +157,7 @@
     { href: 'holding.html', label: 'My Collection' },
     { href: 'watchlist.html', label: 'Watchlist' },
     { href: 'invested.html', label: 'Invested' },
-    { href: 'sold.html', label: 'Sold' },
+    { href: 'sales.html', label: 'Sales' },
     { href: 'pricecheck.html', label: 'Price Check' }
   ];
 
@@ -168,13 +168,13 @@
   }
 
   function defaultStatusForPage() {
-    const map = { 'holding.html': 'Holding', 'watchlist.html': 'Watchlist', 'sold.html': 'Sold' };
+    const map = { 'holding.html': 'Holding', 'watchlist.html': 'Watchlist', 'sales.html': 'Sold' };
     return map[currentFile()] || 'Holding';
   }
 
   // El valor interno sigue siendo 'Holding' (así se guarda en Supabase, sin tocar datos existentes);
   // esto solo cambia lo que se muestra en pantalla.
-  function statusLabel(s) { return s === 'Holding' ? 'My Collection' : s; }
+  function statusLabel(s) { if (s === 'Holding') return 'My Collection'; if (s === 'Sold') return 'Sales'; return s; }
 
   function buildMenu() {
     const cur = currentFile();
@@ -332,7 +332,8 @@
         '</div>' +
         '<div class="cx-form-row"><label>Cardmarket link</label><input type="text" id="cx-f-url" placeholder="https://www.cardmarket.com/en/Riftbound/Products/..."/></div>' +
         (showPrice ? '<div class="cx-form-row"><label>' + priceLabel + '</label><input type="number" step="0.01" id="cx-f-price"/></div>' : '') +
-        '<div style="font-size:11px;color:var(--text-muted);margin:2px 0 10px;line-height:1.4;">Card name, set and condition are guessed from the link — you can refine them anytime from chat.</div>' +
+        '<div class="cx-form-row"><label>Image URL (optional)</label><input type="text" id="cx-f-image" placeholder="Paste a direct image link if you have one"/></div>' +
+        '<div style="font-size:11px;color:var(--text-muted);margin:2px 0 10px;line-height:1.4;">Card name, set and condition are guessed from the link — you can refine them anytime from chat. Image can\'t be fetched automatically (Cardmarket blocks it), so paste one if you have it, or ask Claude to find one later.</div>' +
         '<div class="cx-form-error" id="cx-form-error"></div>' +
         '<div class="cx-form-actions">' +
         '<button class="cx-btn cx-btn-ghost" id="cx-form-cancel">Cancel</button>' +
@@ -361,11 +362,13 @@
     const normalizedUrl = normalizeCardmarketUrl(url);
     const parsed = parseCardmarketUrl(normalizedUrl);
     const today = new Date().toISOString().slice(0, 10);
+    const imageUrl = document.getElementById('cx-f-image').value.trim();
     const fields = {
       card_name: parsed.name || 'Unnamed card (please update)',
       set: parsed.set || null,
       condition: parsed.condition || null,
       cardmarket_url: normalizedUrl,
+      card_image: imageUrl || null,
       status: status,
       current_price: price
     };

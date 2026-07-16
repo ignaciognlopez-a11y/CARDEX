@@ -199,15 +199,10 @@
           <span class="sm-value" id="s-total">—</span>
           <span class="sm-sub">all positions</span>
         </div>
-        <div class="summary-metric clickable" id="sold-metric" title="Total amount already received from completed sales. Click to open the Sold page.">
+        <div class="summary-metric clickable" id="sold-metric" title="Total amount already received from completed sales. Click to open the Sales page.">
           <span class="sm-label">Total Sold ↗</span>
           <span class="sm-value" id="s-sold">—</span>
           <span class="sm-sub" id="s-sold-count">no sales yet</span>
-        </div>
-        <div class="summary-metric clickable" id="flow-metric" title="Total Sold minus Total Invested — how much of your invested capital you've recovered through sales. Click to open the Sold page.">
-          <span class="sm-label">Net Capital Recovery ↗</span>
-          <span class="sm-value" id="s-flow">—</span>
-          <span class="sm-sub" id="s-flow-sub">—</span>
         </div>
       </div>
       <div class="hobby-total-line" title="Total Invested (My Collection) plus everything logged in your supplies/equipment expenses.">Total hobby spend (cards + supplies): <b id="s-hobby-total">—</b></div>
@@ -595,7 +590,6 @@
     const pnl=paidMarket-totalInvested;
     const pct=totalInvested>0?pnl/totalInvested*100:0;
     const totalSold=sold.reduce((s,c)=>s+(c.sellPrice||0)*(c.qty||1),0);
-    const totalFlow=totalSold-totalInvested;
 
     document.getElementById('s-invested').textContent=fmt(totalInvested);
     document.getElementById('s-paid').textContent=fmt(paidMarket);
@@ -604,11 +598,6 @@
     const pctEl=document.getElementById('s-pct'); pctEl.textContent=fmtPct(pct)+' on cost';pctEl.className='sm-sub '+(pnl>=0?'pos':'neg');
     document.getElementById('s-sold').textContent=fmt(totalSold);
     document.getElementById('s-sold-count').textContent=sold.length?(sold.length+(sold.length===1?' sale':' sales')):'no sales yet';
-    const flowEl=document.getElementById('s-flow'); flowEl.textContent=fmtSign(totalFlow);flowEl.className='sm-value '+(totalFlow>=0?'pos':'neg');
-    const flowSubEl=document.getElementById('s-flow-sub');
-    if(totalInvested>0){ const recoveredPct=Math.min(totalSold/totalInvested*100,999); flowSubEl.textContent=totalFlow>=0?'fully recovered + profit':recoveredPct.toFixed(0)+'% of investment recovered'; }
-    else { flowSubEl.textContent='sold − invested'; }
-    flowSubEl.className='sm-sub '+(totalFlow>=0?'pos':'neg');
 
     const suppliesTotal = window.portfolioData.suppliesTotal || 0;
     const hobbyTotalEl = document.getElementById('s-hobby-total');
@@ -661,8 +650,7 @@
       'pnl-metric': 'holding.html',
       'paid-metric': 'holding.html',
       'total-metric': 'holding.html',
-      'sold-metric': 'sold.html',
-      'flow-metric': 'sold.html'
+      'sold-metric': 'sales.html'
     };
     Object.keys(metricTargets).forEach(id=>{
       const el = document.getElementById(id);
