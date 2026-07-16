@@ -26,10 +26,16 @@
   .badge { font-size:10px; padding:2px 7px; border-radius:10px; background:rgba(184,145,46,0.15); color:var(--gold); }
   .progress { font-size:12px; color:var(--muted); margin-bottom:12px; }
   .empty { color:var(--muted); padding:30px; text-align:center; }
+  header { display:flex; align-items:center; gap:14px; margin-bottom:22px; }
+  .logo-text { font-family:'Montserrat',sans-serif; font-weight:800; font-size:22px; letter-spacing:0.02em; background:linear-gradient(135deg,#e8c766,#b8912e 55%,#8a6d1a); -webkit-background-clip:text; background-clip:text; color:transparent; line-height:1; }
 </style>
 </head>
 <body>
 
+<header>
+  <span class="logo-text">CARDEX</span>
+  <span style="font-size:13px;font-weight:700;color:var(--muted);">Price Check</span>
+</header>
 <h1>CARDEX — Price Check</h1>
 <div class="sub">Abre cada carta en Cardmarket, resuelve el captcha si aparece, y usa el panel flotante de Tampermonkey para actualizar el precio. Nada de esto pasa por Claude.</div>
 
@@ -125,5 +131,6 @@ document.getElementById('reset-progress').addEventListener('click', () => { setD
 
 load();
 </script>
+<script src="cardex-shared.js"></script>
 </body>
 </html>

@@ -157,7 +157,8 @@
     { href: 'holding.html', label: 'Holding' },
     { href: 'watchlist.html', label: 'Watchlist' },
     { href: 'invested.html', label: 'Invested' },
-    { href: 'sold.html', label: 'Sold' }
+    { href: 'sold.html', label: 'Sold' },
+    { href: 'pricecheck.html', label: 'Price Check' }
   ];
 
   function currentFile() {
