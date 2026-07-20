@@ -50,21 +50,25 @@
       fetch(SUPABASE_URL + "/rest/v1/riftbound_inversiones?select=*", { headers: baseHeaders })
         .then(function (r) { if (!r.ok) throw new Error("Supabase fetch failed: " + r.status); return r.json(); }),
       fetch(SUPABASE_URL + "/rest/v1/riftbound_gastos?select=price", { headers: baseHeaders })
+        .then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; }),
+      fetch(SUPABASE_URL + "/rest/v1/riftbound_retiros?select=*&order=withdrawal_date.desc", { headers: baseHeaders })
         .then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; })
     ]).then(function (results) {
       const rows = results[0];
       const gastos = results[1];
+      const retiros = results[2] || [];
       const suppliesTotal = gastos.reduce(function (s, g) { return s + Number(g.price || 0); }, 0);
       const cards = rows.map(mapRow);
       const updatedAt = rows.reduce(function (max, row) {
         const u = row.updated_at ? row.updated_at.slice(0, 10) : null;
         return (u && (!max || u > max)) ? u : max;
       }, null);
-      window.portfolioData = { updatedAt: updatedAt || new Date().toISOString().slice(0, 10), cards: cards, suppliesTotal: suppliesTotal };
+      const retirosTotal = retiros.reduce(function (s, r) { return s + Number(r.amount || 0); }, 0);
+      window.portfolioData = { updatedAt: updatedAt || new Date().toISOString().slice(0, 10), cards: cards, suppliesTotal: suppliesTotal, retiros: retiros, retirosTotal: retirosTotal };
       return window.portfolioData;
     }).catch(function (err) {
       console.error("Error cargando datos de Supabase:", err);
-      window.portfolioData = { updatedAt: null, cards: [], suppliesTotal: 0 };
+      window.portfolioData = { updatedAt: null, cards: [], suppliesTotal: 0, retiros: [], retirosTotal: 0 };
       return window.portfolioData;
     });
   }
@@ -99,6 +103,20 @@
   }
   function deleteCard(dbId) {
     return fetch(SUPABASE_URL + "/rest/v1/riftbound_inversiones?id=eq." + encodeURIComponent(dbId), {
+      method: "DELETE",
+      headers: writeHeaders
+    }).then(function (r) { if (!r.ok) return r.text().then(function(t){throw new Error(t);}); return true; });
+  }
+
+  function insertRetiro(fields) {
+    return fetch(SUPABASE_URL + "/rest/v1/riftbound_retiros", {
+      method: "POST",
+      headers: Object.assign({ "Prefer": "return=representation" }, writeHeaders),
+      body: JSON.stringify(fields)
+    }).then(function (r) { if (!r.ok) return r.text().then(function(t){throw new Error(t);}); return r.json(); });
+  }
+  function deleteRetiro(id) {
+    return fetch(SUPABASE_URL + "/rest/v1/riftbound_retiros?id=eq." + encodeURIComponent(id), {
       method: "DELETE",
       headers: writeHeaders
     }).then(function (r) { if (!r.ok) return r.text().then(function(t){throw new Error(t);}); return true; });
@@ -146,10 +164,54 @@
   .cx-move-btn{flex:1;padding:10px 6px;border-radius:8px;border:1px solid rgba(184,145,46,0.25);background:rgba(255,255,255,0.03);color:#9a9a9a;font-size:12px;font-weight:700;cursor:pointer;text-align:center;}
   .cx-move-btn.current{border-color:#b8912e;color:#b8912e;background:rgba(184,145,46,0.08);}
   .cx-move-btn:not(.current):hover{color:#f2f2f2;border-color:rgba(184,145,46,0.55);}
+  .cx-gate-overlay{position:fixed;inset:0;background:#050505;z-index:999999;display:flex;align-items:center;justify-content:center;padding:20px;}
+  .cx-gate-box{background:linear-gradient(160deg,#1a1a1a 0%,#0a0a0a 60%,#000 100%);border:1px solid rgba(184,145,46,0.32);border-radius:16px;padding:32px 28px;width:320px;max-width:100%;text-align:center;box-shadow:0 30px 70px rgba(0,0,0,0.9);}
+  .cx-gate-logo{font-family:'Montserrat',sans-serif;font-weight:800;font-size:24px;letter-spacing:0.02em;background:linear-gradient(135deg,#e8c766,#b8912e 55%,#8a6d1a);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:20px;}
+  .cx-gate-box input{width:100%;box-sizing:border-box;background:rgba(255,255,255,0.05);border:1px solid rgba(184,145,46,0.25);border-radius:7px;padding:11px 12px;color:#f2f2f2;font-size:15px;text-align:center;letter-spacing:0.2em;margin-bottom:12px;font-family:inherit;}
+  .cx-gate-box input:focus{outline:none;border-color:#b8912e;}
+  .cx-gate-box button{width:100%;padding:11px;border-radius:8px;background:#b8912e;color:#000;font-weight:700;font-size:13px;border:none;cursor:pointer;}
+  .cx-gate-box button:hover{background:#d9b04a;}
+  .cx-gate-error{color:#ff5a5a;font-size:12px;margin-top:10px;min-height:14px;}
   `;
   const styleTag = document.createElement('style');
   styleTag.textContent = css;
   document.head.appendChild(styleTag);
+
+  // ---------- Gate de acceso al sitio (protección básica en el navegador) ----------
+  // Nota: igual que el gate de edición, esto es solo un filtro visual en el navegador,
+  // no autenticación real — los datos siguen siendo públicos vía la API de Supabase.
+  function showSiteGate() {
+    document.documentElement.style.overflow = 'hidden';
+    const overlay = document.createElement('div');
+    overlay.className = 'cx-gate-overlay';
+    overlay.id = 'cx-gate-overlay';
+    overlay.innerHTML =
+      '<div class="cx-gate-box">' +
+      '<div class="cx-gate-logo">CARDEX</div>' +
+      '<input type="password" id="cx-gate-input" placeholder="Contraseña" autocomplete="off" inputmode="numeric"/>' +
+      '<button id="cx-gate-submit">Entrar</button>' +
+      '<div class="cx-gate-error" id="cx-gate-error"></div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+    const input = overlay.querySelector('#cx-gate-input');
+    const errEl = overlay.querySelector('#cx-gate-error');
+    function tryUnlock() {
+      if (input.value === APP_PASSWORD) {
+        sessionStorage.setItem('cardex_unlocked', '1');
+        document.documentElement.style.overflow = '';
+        overlay.remove();
+      } else {
+        errEl.textContent = 'Contraseña incorrecta.';
+        input.value = '';
+      }
+      input.focus();
+    }
+    overlay.querySelector('#cx-gate-submit').addEventListener('click', tryUnlock);
+    input.addEventListener('keydown', function (e) { if (e.key === 'Enter') tryUnlock(); });
+    setTimeout(function () { input.focus(); }, 50);
+  }
+  if (!isUnlocked()) showSiteGate();
+
 
   // ---------- Menú hamburguesa ----------
   const PAGES = [
@@ -332,8 +394,7 @@
         '</div>' +
         '<div class="cx-form-row"><label>Cardmarket link</label><input type="text" id="cx-f-url" placeholder="https://www.cardmarket.com/en/Riftbound/Products/..."/></div>' +
         (showPrice ? '<div class="cx-form-row"><label>' + priceLabel + '</label><input type="number" step="0.01" id="cx-f-price"/></div>' : '') +
-        '<div class="cx-form-row"><label>Image URL (optional)</label><input type="text" id="cx-f-image" placeholder="Paste a direct image link if you have one"/></div>' +
-        '<div style="font-size:11px;color:var(--text-muted);margin:2px 0 10px;line-height:1.4;">Card name, set and condition are guessed from the link — you can refine them anytime from chat. Image can\'t be fetched automatically (Cardmarket blocks it), so paste one if you have it, or ask Claude to find one later.</div>' +
+        '<div style="font-size:11px;color:var(--text-muted);margin:2px 0 10px;line-height:1.4;">Card name, set and condition are guessed from the link — you can refine them anytime from chat. The image fills in automatically later, no need to add it here.</div>' +
         '<div class="cx-form-error" id="cx-form-error"></div>' +
         '<div class="cx-form-actions">' +
         '<button class="cx-btn cx-btn-ghost" id="cx-form-cancel">Cancel</button>' +
@@ -362,13 +423,12 @@
     const normalizedUrl = normalizeCardmarketUrl(url);
     const parsed = parseCardmarketUrl(normalizedUrl);
     const today = new Date().toISOString().slice(0, 10);
-    const imageUrl = document.getElementById('cx-f-image').value.trim();
     const fields = {
       card_name: parsed.name || 'Unnamed card (please update)',
       set: parsed.set || null,
       condition: parsed.condition || null,
       cardmarket_url: normalizedUrl,
-      card_image: imageUrl || null,
+      card_image: null,
       status: status,
       current_price: price
     };
@@ -460,10 +520,45 @@
     });
   }
 
+  function openRetiroModal() {
+    const today = new Date().toISOString().slice(0, 10);
+    openForm(
+      '<div class="cx-form-title">Registrar retiro a ahorros</div>' +
+      '<div class="cx-form-row"><label>Importe (€)</label><input type="number" step="0.01" id="cx-r-amount"/></div>' +
+      '<div class="cx-form-row"><label>Fecha</label><input type="date" id="cx-r-date" value="' + today + '"/></div>' +
+      '<div class="cx-form-row"><label>Nota (opcional)</label><input type="text" id="cx-r-notes" placeholder="p.ej. transferencia a cuenta de ahorros"/></div>' +
+      '<div class="cx-form-error" id="cx-form-error"></div>' +
+      '<div class="cx-form-actions">' +
+      '<button class="cx-btn cx-btn-ghost" id="cx-form-cancel">Cancelar</button>' +
+      '<button class="cx-btn cx-btn-primary" id="cx-form-save">Guardar</button>' +
+      '</div>'
+    );
+    document.getElementById('cx-form-cancel').addEventListener('click', closeForm);
+    document.getElementById('cx-form-save').addEventListener('click', function () {
+      const errEl = document.getElementById('cx-form-error');
+      const amount = Number(document.getElementById('cx-r-amount').value);
+      const date = document.getElementById('cx-r-date').value;
+      const notes = document.getElementById('cx-r-notes').value.trim();
+      if (!amount || amount <= 0) { errEl.textContent = 'Introduce un importe válido.'; errEl.style.display = 'block'; return; }
+      if (!date) { errEl.textContent = 'Introduce una fecha.'; errEl.style.display = 'block'; return; }
+      insertRetiro({ amount: amount, withdrawal_date: date, notes: notes || null }).then(function () {
+        closeForm();
+        return window.CardexReload();
+      }).then(function () {
+        if (typeof window.CardexOnDataChange === 'function') window.CardexOnDataChange();
+        else window.location.reload();
+      }).catch(function (err) {
+        errEl.textContent = 'Error al guardar: ' + err.message;
+        errEl.style.display = 'block';
+      });
+    });
+  }
+
   window.CardexAuth = { requirePassword: requirePassword, isUnlocked: isUnlocked };
-  window.CardexAPI = { insertCard: insertCard, updateCard: updateCard, deleteCard: deleteCard };
+  window.CardexAPI = { insertCard: insertCard, updateCard: updateCard, deleteCard: deleteCard, insertRetiro: insertRetiro, deleteRetiro: deleteRetiro };
   window.CardexOpenMove = function (item) { requirePassword(function () { openMoveModal(item); }); };
   window.CardexOpenAdd = function (status) { requirePassword(function () { openAddModal(status); }); };
+  window.CardexOpenRetiro = function () { requirePassword(function () { openRetiroModal(); }); };
 
   document.addEventListener('DOMContentLoaded', function () {
     buildMenu();

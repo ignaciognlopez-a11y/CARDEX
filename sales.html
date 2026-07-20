@@ -126,6 +126,13 @@
     .simple-name { font-size:12px; font-weight:600; color:var(--text); flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .simple-price { font-size:12px; font-weight:700; color:var(--text); flex-shrink:0; min-width:70px; text-align:right; }
     .simple-price.free { color:rgba(255,255,255,0.35); font-weight:600; }
+    .wd-row { display:flex; align-items:center; gap:10px; padding:9px 4px; border-bottom:1px solid rgba(255,255,255,0.05); }
+    .wd-row:last-child { border-bottom:none; }
+    .wd-date { font-size:11px; color:var(--text-muted); width:84px; flex-shrink:0; }
+    .wd-notes { font-size:12px; color:var(--text); flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .wd-amount { font-size:13px; font-weight:700; color:var(--red); flex-shrink:0; }
+    .wd-delete { width:22px; height:22px; border-radius:50%; background:rgba(255,90,90,0.12); border:1px solid rgba(255,90,90,0.3); color:var(--red); font-size:11px; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+    .wd-delete:hover { background:rgba(255,90,90,0.22); }
 
     /* WATCHLIST STRIP */
     .wl-strip { margin-bottom:28px; background:rgba(20,20,20,0.78); border:1px solid rgba(184,145,46,0.29); border-radius:var(--radius); padding:12px 16px; backdrop-filter:blur(20px); box-shadow:0 6px 24px rgba(0,0,0,0.55),0 0 0 1px rgba(255,255,255,0.04),inset 0 1px 0 rgba(255,255,255,0.06); }
@@ -341,6 +348,19 @@
       <span class="sm-value" id="s-flow">—</span>
       <span class="sm-sub" id="s-flow-sub">—</span>
     </div>
+    <div class="summary-metric clickable span-2" id="reinvested-metric" title="Total Cashed Out minus everything you've withdrawn to your savings account — money still available to reinvest. Click for a breakdown.">
+      <span class="sm-label">Reinvertido</span>
+      <span class="sm-value" id="s-reinvested">—</span>
+      <span class="sm-sub" id="s-reinvested-sub">—</span>
+    </div>
+  </div>
+
+  <div class="panel" id="withdrawals-panel">
+    <div class="panel-title">
+      <span class="p-main">Retiros a ahorros</span>
+      <button class="cx-header-add" id="add-withdrawal-btn" style="margin-left:0;">+ Registrar retiro</button>
+    </div>
+    <div id="withdrawals-list"></div>
   </div>
 
   <div class="panel" id="opportunities-panel" style="display:none;">
@@ -410,6 +430,16 @@
       <button class="pnl-close" id="flow-close">✕</button>
     </div>
     <div class="pnl-list" id="flow-list"></div>
+  </div>
+</div>
+
+<div class="pnl-overlay" id="reinvested-overlay">
+  <div class="pnl-modal">
+    <div class="pnl-header">
+      <div><div class="pnl-title">Reinvertido</div><span class="pnl-total-val" id="reinvested-total-val">—</span></div>
+      <button class="pnl-close" id="reinvested-close">✕</button>
+    </div>
+    <div class="pnl-list" id="reinvested-list"></div>
   </div>
 </div>
 
@@ -559,7 +589,7 @@
   document.getElementById('modal-close-x').addEventListener('click',closeModal);
   document.getElementById('modal-edit-btn').addEventListener('click',()=>{ if(currentModalItem) window.CardexOpenMove(currentModalItem); });
   document.getElementById('modal-overlay').addEventListener('click',e=>{if(e.target.id==='modal-overlay')closeModal();});
-  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();['flow-overlay','reinvested-overlay'].forEach(id=>{const ov=document.getElementById(id);if(ov)ov.classList.remove('open');});}});
   document.querySelectorAll('#range-filters .range-btn').forEach(btn=>{
     btn.addEventListener('click',()=>{
       document.querySelectorAll('#range-filters .range-btn').forEach(b=>b.classList.remove('active'));
@@ -625,7 +655,7 @@
     const opportunities = dupes
       .map(c=>({ c, pct:(c.currentPrice-c.buyPrice)/c.buyPrice*100 }))
       .filter(x=>x.pct>=OPPORTUNITY_PCT_THRESHOLD)
-      .sort((a,b)=>b.pct-a.pct);
+      .sort((a,b)=>b.c.currentPrice-a.c.currentPrice);
     const panel = document.getElementById('opportunities-panel');
     if (!opportunities.length){ panel.style.display='none'; return; }
     panel.style.display='';
@@ -689,6 +719,48 @@
       document.body.style.overflow='hidden';
     };
 
+    // ── RETIROS A AHORROS ──
+    const retiros = window.portfolioData.retiros || [];
+    const retirosTotal = window.portfolioData.retirosTotal || 0;
+    const reinvested = totalSold - retirosTotal;
+
+    const reinvEl = document.getElementById('s-reinvested');
+    reinvEl.textContent = fmt(reinvested); reinvEl.className = 'sm-value '+(reinvested>=0?'pos':'neg');
+    document.getElementById('s-reinvested-sub').textContent = retirosTotal>0 ? fmt(retirosTotal)+' retirados a ahorros' : 'nada retirado todavía';
+
+    document.getElementById('withdrawals-list').innerHTML = retiros.length ? retiros.map(r => `
+      <div class="wd-row">
+        <span class="wd-date">${new Date(r.withdrawal_date+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</span>
+        <span class="wd-notes">${r.notes || '—'}</span>
+        <span class="wd-amount">-${fmt(Number(r.amount))}</span>
+        <button class="wd-delete" data-id="${r.id}" title="Eliminar">✕</button>
+      </div>`).join('') : '<div class="empty-state" style="padding:10px 2px;font-size:12px;">Todavía no has registrado ningún retiro.</div>';
+    document.querySelectorAll('.wd-delete').forEach(btn=>{
+      btn.onclick = () => {
+        window.CardexAuth.requirePassword(() => {
+          if (!confirm('¿Eliminar este retiro?')) return;
+          window.CardexAPI.deleteRetiro(btn.dataset.id).then(() => window.CardexReload()).then(() => window.CardexOnDataChange());
+        });
+      };
+    });
+
+    document.getElementById('reinvested-metric').onclick = () => {
+      document.getElementById('reinvested-total-val').textContent = fmt(reinvested);
+      document.getElementById('reinvested-total-val').style.color = reinvested>=0?'var(--green)':'var(--red)';
+      const cashedRows = soldItems.map(c => ({ image:c.image, name:c.name, lineValue:(c.sellPrice||0)*(c.qty||1), tag:'Cashed out', sign:'+', cls:'pos' }));
+      const withdrawalRows = retiros.map(r => ({ image:'', name:r.notes||'Retiro a ahorros', lineValue:Number(r.amount), tag:new Date(r.withdrawal_date+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}), sign:'-', cls:'neg' }));
+      const rows = [...cashedRows, ...withdrawalRows].sort((a,b)=>b.lineValue-a.lineValue);
+      document.getElementById('reinvested-list').innerHTML = rows.map(r=>`
+        <div class="simple-row">
+          <img class="simple-img" src="${r.image||''}" alt="" onerror="this.style.opacity=0.1"/>
+          <span class="simple-name">${r.name} <span style="color:var(--text-muted);font-weight:500;">(${r.tag})</span></span>
+          <span class="simple-price" style="color:${r.cls==='pos'?'var(--green)':'var(--red)'}">${r.sign}${fmt(r.lineValue)}</span>
+        </div>`).join('');
+      document.getElementById('reinvested-overlay').classList.add('open');
+      document.body.style.overflow='hidden';
+    };
+    document.getElementById('add-withdrawal-btn').onclick = () => window.CardexOpenRetiro();
+
     if (!count){
       document.getElementById('sold-table-holder').innerHTML = '<div class="empty-state">No sales recorded yet. Sold cards will show up here once you mark a position as sold.</div>';
     } else {
@@ -702,6 +774,8 @@
   }
   document.getElementById('flow-close').addEventListener('click', ()=>{ document.getElementById('flow-overlay').classList.remove('open'); document.body.style.overflow=''; });
   document.getElementById('flow-overlay').addEventListener('click', e=>{ if(e.target.id==='flow-overlay'){ document.getElementById('flow-overlay').classList.remove('open'); document.body.style.overflow=''; } });
+  document.getElementById('reinvested-close').addEventListener('click', ()=>{ document.getElementById('reinvested-overlay').classList.remove('open'); document.body.style.overflow=''; });
+  document.getElementById('reinvested-overlay').addEventListener('click', e=>{ if(e.target.id==='reinvested-overlay'){ document.getElementById('reinvested-overlay').classList.remove('open'); document.body.style.overflow=''; } });
   window.CardexOnDataChange = renderPage;
   window.__portfolioDataPromise.then(renderPage);
 })();

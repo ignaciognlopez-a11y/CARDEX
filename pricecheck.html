@@ -17,7 +17,7 @@
   th { text-align:left; font-size:12px; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); padding:10px 8px; border-bottom:1px solid rgba(184,145,46,0.25); }
   td { padding:8px; border-bottom:1px solid rgba(255,255,255,0.05); vertical-align:middle; }
   td.name { font-size:14px; font-weight:600; }
-  .check-btn { background:var(--gold); color:#000; text-decoration:none; font-weight:700; padding:5px 12px; border-radius:6px; font-size:12px; display:inline-block; }
+  .check-btn { background:var(--gold); color:#000; text-decoration:none; font-weight:700; padding:5px 12px; border-radius:6px; font-size:12px; display:inline-block; border:none; cursor:pointer; font-family:inherit; }
   .check-btn:hover { background:#d9b04a; }
   .mark-done { background:none; border:1px solid rgba(255,255,255,0.15); color:var(--muted); padding:5px 10px; border-radius:6px; font-size:11px; cursor:pointer; margin-left:6px; }
   .badge { font-size:10px; padding:2px 7px; border-radius:10px; background:rgba(184,145,46,0.15); color:var(--gold); }
@@ -27,6 +27,11 @@
   .empty { color:var(--muted); padding:30px; text-align:center; }
   header { display:flex; align-items:center; gap:14px; margin-bottom:22px; }
   .logo-text { font-family:'Montserrat',sans-serif; font-weight:800; font-size:22px; letter-spacing:0.02em; background:linear-gradient(135deg,#e8c766,#b8912e 55%,#8a6d1a); -webkit-background-clip:text; background-clip:text; color:transparent; line-height:1; }
+  .scope-filter { display:flex; gap:6px; }
+  .scope-btn { font-size:12px; font-weight:700; padding:6px 14px; border-radius:7px; border:1px solid rgba(184,145,46,0.35); background:rgba(20,20,20,0.75); color:var(--muted); cursor:pointer; transition:all 0.15s; }
+  .scope-btn:hover { color:var(--text); border-color:rgba(184,145,46,0.6); }
+  .scope-btn.active { background:var(--gold); border-color:var(--gold); color:#000; }
+  .filter-label { font-size:12px; color:var(--muted); font-weight:700; }
 </style>
 </head>
 <body>
@@ -37,8 +42,11 @@
 </header>
 
 <div class="controls">
-  <label><input type="checkbox" id="f-holding" checked/> My Collection</label>
-  <label><input type="checkbox" id="f-watchlist" checked/> Watchlist</label>
+  <span class="filter-label">Filter:</span>
+  <div class="scope-filter" id="scope-filter">
+    <button class="scope-btn active" data-scope="holding">My Collection</button>
+    <button class="scope-btn active" data-scope="watchlist">Watchlist</button>
+  </div>
   <button class="btn" id="reload">Load DB</button>
   <button class="btn" id="bulk-start" style="background:#b8912e;color:#000;font-weight:700;border-color:#b8912e;">Full Price Check</button>
   <button class="btn" id="bulk-remaining">Check Remaining</button>
@@ -46,8 +54,8 @@
 
 <div class="progress" id="progress"></div>
 <table>
-  <thead><tr><th>Card</th><th>Set</th><th>Last Price Checked</th><th>New Price</th><th>Updated</th><th></th></tr></thead>
-  <tbody id="rows"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody>
+  <thead><tr><th>Card</th><th>Set</th><th>Last Price Checked</th><th>New Price</th><th></th></tr></thead>
+  <tbody id="rows"><tr><td colspan="5" class="empty">Loading…</td></tr></tbody>
 </table>
 
 <script>
@@ -56,12 +64,12 @@ const SUPABASE_KEY = "sb_publishable_WJTVFkd8c12jW6VJOwXcQQ_0XBkU_Bn";
 const headers = { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY };
 const DONE_KEY = 'cdx_pricecheck_done_' + new Date().toISOString().slice(0,10);
 
+// "manualDone" ya no se puede marcar a mano: solo lo rellena el propio script en bloque
+// cuando termina una tanda (handleBulkReturn), para que "Check Remaining" sepa retomar
+// aunque el updated_at de Supabase tarde en llegar.
 function getDone() { try { return JSON.parse(localStorage.getItem(DONE_KEY) || '[]'); } catch(e) { return []; } }
 function setDone(arr) { localStorage.setItem(DONE_KEY, JSON.stringify(arr)); }
-function markDone(url) { const d = getDone(); if (!d.includes(url)) { d.push(url); setDone(d); } }
 
-// "Comprobada hoy" = de verdad se escribió en Supabase hoy (updated_at), O se marcó a mano.
-// Así "Check Remaining" sabe retomar aunque una tanda en bloque se cortase a mitad.
 function isDoneToday(url, info, today, manualDone) {
   const updatedToday = info.updatedAt && info.updatedAt.slice(0, 10) === today;
   return updatedToday || manualDone.includes(url);
@@ -82,9 +90,10 @@ function b64urlDecode(str) {
 
 let allRows = [];
 let baselinePrices = null; // precio guardado en la primera carga de esta sesión, por cardmarket_url
+let scopeHolding = true, scopeWatchlist = true;
 
 async function load() {
-  document.getElementById('rows').innerHTML = '<tr><td colspan="6" class="empty">Loading…</td></tr>';
+  document.getElementById('rows').innerHTML = '<tr><td colspan="5" class="empty">Loading…</td></tr>';
   const res = await fetch(SUPABASE_URL + "/rest/v1/riftbound_inversiones?select=id,card_name,set,current_price,cardmarket_url,status,updated_at&order=cardmarket_url", { headers });
   allRows = await res.json();
   if (!baselinePrices) {
@@ -94,26 +103,29 @@ async function load() {
   render();
 }
 
-function render() {
-  const showHolding = document.getElementById('f-holding').checked;
-  const showWatchlist = document.getElementById('f-watchlist').checked;
-  const filtered = allRows.filter(r =>
+function filteredRows() {
+  return allRows.filter(r =>
     r.cardmarket_url && (
-      (showHolding && r.status === 'Holding') ||
-      (showWatchlist && r.status === 'Watchlist')
+      (scopeHolding && r.status === 'Holding') ||
+      (scopeWatchlist && r.status === 'Watchlist')
     )
   );
+}
 
-  // Agrupar por URL única (varias filas pueden compartir carta)
+function groupByUrl(rows) {
   const byUrl = {};
-  filtered.forEach(r => {
+  rows.forEach(r => {
     if (!byUrl[r.cardmarket_url]) byUrl[r.cardmarket_url] = { name: r.card_name, set: r.set, price: r.current_price, ids: [], updatedAt: null };
     byUrl[r.cardmarket_url].ids.push(r.id);
     if (!byUrl[r.cardmarket_url].updatedAt || (r.updated_at && r.updated_at > byUrl[r.cardmarket_url].updatedAt)) {
       byUrl[r.cardmarket_url].updatedAt = r.updated_at;
     }
   });
+  return byUrl;
+}
 
+function render() {
+  const byUrl = groupByUrl(filteredRows());
   const today = new Date().toISOString().slice(0, 10);
   const manualDone = getDone();
   const entries = Object.entries(byUrl).sort((a,b) => (a[1].name||'').localeCompare(b[1].name||''));
@@ -122,13 +134,12 @@ function render() {
   document.getElementById('progress').textContent = doneCount + ' / ' + entries.length + ' checked today';
 
   if (!entries.length) {
-    document.getElementById('rows').innerHTML = '<tr><td colspan="6" class="empty">No cards with a Cardmarket link in the current filter.</td></tr>';
+    document.getElementById('rows').innerHTML = '<tr><td colspan="5" class="empty">No cards with a Cardmarket link in the current filter.</td></tr>';
     return;
   }
 
   document.getElementById('rows').innerHTML = entries.map(([url, info]) => {
     const isDone = isDoneToday(url, info, today, manualDone);
-    const launchUrl = url + (url.includes('#') ? '' : '#cdx=' + info.ids.join(','));
     const baseline = baselinePrices ? baselinePrices[url] : null;
     const priceTxt = baseline != null ? Number(baseline).toLocaleString('de-DE',{minimumFractionDigits:2}) + ' €' : '—';
     const newPriceNum = info.price != null ? Number(info.price) : null;
@@ -143,49 +154,14 @@ function render() {
       <td>${info.set || '—'} ${info.ids.length > 1 ? '<span class="badge">x' + info.ids.length + '</span>' : ''}</td>
       <td>${priceTxt}</td>
       <td class="${newPriceClass}">${newPriceTxt}</td>
-      <td>${isDone ? '✅' : '—'}</td>
-      <td>
-        <a class="check-btn" href="${launchUrl}" target="_blank" rel="noopener" onclick="setTimeout(()=>markThenRender('${url}'), 300)">Check →</a>
-        <button class="mark-done" onclick="toggleDone('${url}')">${isDone ? 'Unmark' : 'Mark done'}</button>
-      </td>
+      <td><button class="check-btn" onclick="startCheckFrom('${url}')">Start checking here</button></td>
     </tr>`;
   }).join('');
 }
 
-function markThenRender(url) { markDone(url); render(); }
-function toggleDone(url) {
-  const d = getDone();
-  const idx = d.indexOf(url);
-  if (idx >= 0) d.splice(idx, 1); else d.push(url);
-  setDone(d);
-  render();
-}
-
-function startBulkCheck(onlyRemaining) {
-  const showHolding = document.getElementById('f-holding').checked;
-  const showWatchlist = document.getElementById('f-watchlist').checked;
-  const manualDone = getDone();
-  const today = new Date().toISOString().slice(0, 10);
-
-  const filtered = allRows.filter(r =>
-    r.cardmarket_url && (
-      (showHolding && r.status === 'Holding') ||
-      (showWatchlist && r.status === 'Watchlist')
-    )
-  );
-  const byUrl = {};
-  filtered.forEach(r => {
-    if (!byUrl[r.cardmarket_url]) byUrl[r.cardmarket_url] = { ids: [], name: r.card_name, updatedAt: null };
-    byUrl[r.cardmarket_url].ids.push(r.id);
-    if (!byUrl[r.cardmarket_url].updatedAt || (r.updated_at && r.updated_at > byUrl[r.cardmarket_url].updatedAt)) {
-      byUrl[r.cardmarket_url].updatedAt = r.updated_at;
-    }
-  });
-  let urls = Object.keys(byUrl).sort((a, b) => (byUrl[a].name || '').localeCompare(byUrl[b].name || ''));
-  if (onlyRemaining) urls = urls.filter(u => !isDoneToday(u, byUrl[u], today, manualDone));
-
-  if (!urls.length) { alert(onlyRemaining ? 'Nothing left to check today with the current filter.' : 'No cards match the current filter.'); return; }
-
+// Construye la cadena (queue + back-url) y abre la primera carta en una pestaña nueva.
+function openChain(urls, byUrl) {
+  if (!urls.length) { alert('No cards match the current filter.'); return; }
   const queue = urls.map(u => ({ u, i: byUrl[u].ids }));
   const backUrl = location.href.split('#')[0] + '#bulkdone=' + b64urlEncode(urls);
   const first = queue[0];
@@ -195,8 +171,39 @@ function startBulkCheck(onlyRemaining) {
     '&back=' + b64urlEncode(backUrl);
   window.open(launchUrl, '_blank');
 }
+
+function startBulkCheck(onlyRemaining) {
+  const manualDone = getDone();
+  const today = new Date().toISOString().slice(0, 10);
+  const byUrl = groupByUrl(filteredRows());
+  let urls = Object.keys(byUrl).sort((a, b) => (byUrl[a].name || '').localeCompare(byUrl[b].name || ''));
+  if (onlyRemaining) urls = urls.filter(u => !isDoneToday(u, byUrl[u], today, manualDone));
+  if (!urls.length) { alert(onlyRemaining ? 'Nothing left to check today with the current filter.' : 'No cards match the current filter.'); return; }
+  openChain(urls, byUrl);
+}
+
+// Arranca la cadena de comprobación empezando por una carta concreta (por si el script
+// se corta a mitad y hay que retomar desde ahí), respetando el orden y el filtro actual.
+function startCheckFrom(startUrl) {
+  const byUrl = groupByUrl(filteredRows());
+  let urls = Object.keys(byUrl).sort((a, b) => (byUrl[a].name || '').localeCompare(byUrl[b].name || ''));
+  const idx = urls.indexOf(startUrl);
+  if (idx === -1) { alert('This card is not in the current filter.'); return; }
+  urls = urls.slice(idx);
+  openChain(urls, byUrl);
+}
+
 document.getElementById('bulk-start').addEventListener('click', () => startBulkCheck(false));
 document.getElementById('bulk-remaining').addEventListener('click', () => startBulkCheck(true));
+
+document.querySelectorAll('.scope-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    btn.classList.toggle('active');
+    scopeHolding = document.querySelector('.scope-btn[data-scope="holding"]').classList.contains('active');
+    scopeWatchlist = document.querySelector('.scope-btn[data-scope="watchlist"]').classList.contains('active');
+    render();
+  });
+});
 
 // Al volver de una tanda en bloque, el script deja aquí #bulkdone=<base64url>
 (function handleBulkReturn() {
@@ -211,8 +218,6 @@ document.getElementById('bulk-remaining').addEventListener('click', () => startB
   history.replaceState(null, '', location.pathname + location.search);
 })();
 
-document.getElementById('f-holding').addEventListener('change', render);
-document.getElementById('f-watchlist').addEventListener('change', render);
 document.getElementById('reload').addEventListener('click', load);
 
 load();
