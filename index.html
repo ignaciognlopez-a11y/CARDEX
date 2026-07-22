@@ -36,13 +36,13 @@
 
     main { padding:22px 28px; padding-top:calc(22px + 55px); }
 
-    .top-row { display:flex; align-items:stretch; gap:14px; margin-bottom:20px; flex-wrap:wrap; }
+    .top-row { display:flex; align-items:flex-start; gap:14px; margin-bottom:20px; flex-wrap:wrap; }
     .summary-panel { flex:1 1 0; min-width:320px; display:flex; flex-direction:column; gap:8px; }
     .wl-panel { flex:1 1 0; min-width:280px; display:flex; }
     .summary-panel .summary-box { width:100%; }
     .wl-panel .wl-strip { margin-bottom:0; width:100%; }
 
-    .summary-box { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; background:rgba(20,20,20,0.85); border:1px solid rgba(184,145,46,0.32); border-radius:var(--radius); padding:12px; backdrop-filter:blur(20px); box-shadow:0 6px 28px rgba(0,0,0,0.55),0 0 0 1px rgba(255,255,255,0.04),inset 0 1px 0 rgba(255,255,255,0.07); }
+    .summary-box { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
     .summary-metric { background:rgba(255,255,255,0.02); border:1px solid rgba(184,145,46,0.18); border-radius:9px; padding:10px 11px; display:flex; flex-direction:column; gap:3px; }
     .summary-metric.span-2 { grid-column:1 / -1; }
     .sm-label { font-size:9.5px; text-transform:uppercase; letter-spacing:0.08em; color:rgba(255,255,255,0.75); font-weight:700; }
@@ -84,7 +84,15 @@
     .scrollable-panel-list::-webkit-scrollbar { display:none; }
     .summary-metric.active-metric { border-color:rgba(184,145,46,0.75); box-shadow:0 0 0 1px rgba(184,145,46,0.35), 0 0 16px rgba(184,145,46,0.2); }
 
-    /* BREAKDOWN MODAL */
+    /* BREAKDOWN POPOVER (pequeño, anclado a la métrica, se cierra solo al sacar el ratón) */
+    .breakdown-popover { position:fixed; z-index:150; width:320px; max-width:92vw; max-height:340px; overflow-y:auto; background:rgba(14,14,14,0.97); border:1px solid rgba(184,145,46,0.4); border-radius:12px; padding:12px 14px 8px; box-shadow:0 18px 44px rgba(0,0,0,0.75),0 0 0 1px rgba(255,255,255,0.05),0 0 24px rgba(184,145,46,0.12); backdrop-filter:blur(16px); display:none; opacity:0; transform:translateY(-4px); transition:opacity 0.12s ease, transform 0.12s ease; scrollbar-width:none; -ms-overflow-style:none; }
+    .breakdown-popover::-webkit-scrollbar { display:none; }
+    .breakdown-popover.open { display:block; }
+    .breakdown-popover.show { opacity:1; transform:translateY(0); }
+    .bp-title { font-size:13px; font-weight:800; margin-bottom:1px; }
+    .bp-subtitle { font-size:10.5px; color:var(--text-muted); font-weight:600; margin-bottom:8px; }
+    .bp-list { display:flex; flex-direction:column; gap:2px; }
+
     .breakdown-row { display:flex; align-items:center; gap:10px; padding:8px 6px; border-radius:8px; text-decoration:none; color:inherit; transition:background 0.12s; }
     .breakdown-row:hover { background:rgba(184,145,46,0.08); }
     .breakdown-row img { width:30px; height:30px; border-radius:5px; object-fit:contain; background:#050505; flex-shrink:0; }
@@ -159,12 +167,12 @@
     .range-btn { font-size:10.5px; font-weight:700; padding:3px 8px; border-radius:6px; border:1px solid rgba(184,145,46,0.24); background:rgba(255,255,255,0.03); color:var(--text-muted); cursor:pointer; }
     .range-btn.active { background:var(--orange); border-color:var(--orange); color:#000; }
 
-    .chart-legend { display:flex; gap:16px; font-size:11px; color:var(--text-muted); font-weight:600; margin-bottom:8px; }
+    .chart-legend { display:flex; gap:16px; font-size:11px; color:var(--text-muted); font-weight:600; margin-bottom:5px; }
     .legend-item { display:flex; align-items:center; gap:6px; }
     .legend-dot { width:9px; height:9px; border-radius:50%; display:inline-block; }
     .legend-dot-inv { background:#b8912e; }
     .legend-dot-paid { background:#3ddc84; }
-    .chart-controls { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; flex-wrap:wrap; }
+    .chart-controls { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:5px; flex-wrap:wrap; }
     .partition-toggle { display:flex; gap:3px; background:rgba(255,255,255,0.03); border:1px solid rgba(184,145,46,0.2); border-radius:7px; padding:2px; }
     .partition-btn { font-size:10.5px; font-weight:700; padding:4px 10px; border-radius:5px; border:none; background:transparent; color:var(--text-muted); cursor:pointer; }
     .partition-btn.active { background:var(--orange); color:#000; }
@@ -199,7 +207,8 @@
 <main>
   <div class="top-row">
     <div class="summary-panel">
-      <div class="panel-title" style="margin-bottom:2px;"><span class="p-main">Overall Performance</span></div>
+      <div class="panel">
+      <div class="panel-title" style="margin-bottom:10px;"><span class="p-main">Overall Performance</span></div>
       <div class="summary-box">
         <div class="summary-metric clickable" id="invested-metric" title="Total amount paid for positions currently in My Collection. Hover to see the breakdown.">
           <span class="sm-label">Total Invested ↗</span>
@@ -227,6 +236,7 @@
           <span class="sm-sub" id="s-sold-count">no sales yet</span>
         </div>
       </div>
+      </div>
     </div>
 
     <div class="wl-panel">
@@ -246,9 +256,9 @@
           </div>
           <div class="range-filters" id="metric-range-filters"></div>
         </div>
-        <div class="chart-wrap" id="metric-chart-wrap" style="display:none;min-height:172px;"><canvas id="metric-spark"></canvas><div class="chart-tip" id="metric-chart-tip"></div></div>
+        <div class="chart-wrap" id="metric-chart-wrap" style="display:none;height:128px;min-height:128px;"><canvas id="metric-spark"></canvas><div class="chart-tip" id="metric-chart-tip"></div></div>
         <div class="chart-axis-dates" id="metric-chart-axis-dates" style="display:none"></div>
-        <div class="modal-spark-empty" id="metric-spark-empty" style="min-height:172px;"><span>Not enough data yet.</span></div>
+        <div class="modal-spark-empty" id="metric-spark-empty" style="height:128px;min-height:128px;"><span>Not enough data yet.</span></div>
         <div class="chart-fallback-note" id="metric-chart-fallback-note" style="display:none"></div>
       </div>
     </div>
@@ -295,15 +305,10 @@
 
 </main>
 
-<div class="modal-overlay" id="breakdown-overlay">
-  <div class="modal" style="width:min(94vw,620px);max-width:620px;">
-    <button class="modal-close-x" id="breakdown-close-x">✕</button>
-    <div style="padding:28px 26px 22px;">
-      <div class="modal-name" id="breakdown-title" style="margin-bottom:2px;"></div>
-      <div class="p-sub" id="breakdown-subtitle" style="margin-bottom:14px;"></div>
-      <div id="breakdown-list" class="scrollable-panel-list" style="max-height:60vh;display:flex;flex-direction:column;gap:2px;"></div>
-    </div>
-  </div>
+<div class="breakdown-popover" id="breakdown-overlay">
+  <div class="bp-title" id="breakdown-title"></div>
+  <div class="bp-subtitle" id="breakdown-subtitle"></div>
+  <div id="breakdown-list" class="bp-list"></div>
 </div>
 
 <div class="modal-overlay" id="modal-overlay">
@@ -446,18 +451,37 @@
     }
   };
 
-  // ── BREAKDOWN AL PASAR EL RATÓN (ya no al hacer click) ──
+  // ── BREAKDOWN AL PASAR EL RATÓN: cuadradito pequeño anclado a la métrica,
+  // que se cierra solo en cuanto el ratón sale (de la métrica y del propio popover) ──
   let breakdownHoverTimer = null;
-  function showBreakdownHover(id){
+  function showBreakdownHover(id, anchorEl){
     clearTimeout(breakdownHoverTimer);
-    openBreakdown(id);
+    openBreakdown(id, anchorEl);
   }
   function scheduleBreakdownClose(){
     clearTimeout(breakdownHoverTimer);
     breakdownHoverTimer = setTimeout(closeBreakdown, 120);
   }
 
-  function openBreakdown(id){
+  function positionBreakdownPopover(pop, anchorEl){
+    if (!anchorEl) return;
+    const r = anchorEl.getBoundingClientRect();
+    const margin = 10;
+    let left = r.left;
+    let top = r.bottom + 8;
+    const popW = pop.offsetWidth || 320;
+    const popH = pop.offsetHeight || 220;
+    if (left + popW > window.innerWidth - margin) left = window.innerWidth - popW - margin;
+    if (left < margin) left = margin;
+    if (top + popH > window.innerHeight - margin) {
+      const above = r.top - popH - 8;
+      top = above > margin ? above : Math.max(margin, window.innerHeight - popH - margin);
+    }
+    pop.style.left = left + 'px';
+    pop.style.top = top + 'px';
+  }
+
+  function openBreakdown(id, anchorEl){
     const m = METRICS[id];
     document.getElementById('breakdown-title').textContent = m.title;
     document.getElementById('breakdown-subtitle').textContent = 'Total: ' + m.total();
@@ -471,18 +495,18 @@
           <div class="breakdown-metric"><div class="breakdown-metric-label">${r.m2.label}</div><div class="breakdown-metric-value ${r.m2.cls||''}">${r.m2.value}</div></div>
         </div>
       </a>`).join('') : '<div class="empty-mini">Nothing here yet.</div>';
-    document.getElementById('breakdown-overlay').classList.add('open');
-    document.body.style.overflow = 'hidden';
+    const pop = document.getElementById('breakdown-overlay');
+    pop.classList.add('open');
+    positionBreakdownPopover(pop, anchorEl);
+    requestAnimationFrame(()=>{ positionBreakdownPopover(pop, anchorEl); pop.classList.add('show'); });
   }
   function closeBreakdown(){
-    document.getElementById('breakdown-overlay').classList.remove('open');
-    document.body.style.overflow = '';
+    const pop = document.getElementById('breakdown-overlay');
+    pop.classList.remove('open','show');
   }
-  document.getElementById('breakdown-close-x').addEventListener('click', closeBreakdown);
-  document.getElementById('breakdown-overlay').addEventListener('click', e=>{ if(e.target.id==='breakdown-overlay') closeBreakdown(); });
   document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeBreakdown(); });
-  // Si el ratón entra en el propio panel del breakdown, que no se cierre (por si el
-  // usuario mueve el cursor desde la métrica hasta la lista para hacer scroll).
+  // Si el ratón entra en el propio popover, que no se cierre (por si el usuario mueve
+  // el cursor desde la métrica hasta la lista para hacer scroll o pulsar un enlace).
   document.getElementById('breakdown-overlay').addEventListener('mouseenter', ()=>clearTimeout(breakdownHoverTimer));
   document.getElementById('breakdown-overlay').addEventListener('mouseleave', scheduleBreakdownClose);
 
@@ -968,7 +992,7 @@
       const el = document.getElementById(id);
       if (el) {
         el.onclick = null;
-        el.onmouseenter = () => showBreakdownHover(id);
+        el.onmouseenter = () => showBreakdownHover(id, el);
         el.onmouseleave = () => scheduleBreakdownClose();
       }
     });

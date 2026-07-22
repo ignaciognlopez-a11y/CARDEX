@@ -131,6 +131,12 @@
       body: JSON.stringify({ name: name })
     }).then(function (r) { if (!r.ok) return r.text().then(function(t){throw new Error(t);}); return r.json(); });
   }
+  function deleteWatchlist(name) {
+    return fetch(SUPABASE_URL + "/rest/v1/riftbound_watchlists?name=eq." + encodeURIComponent(name), {
+      method: "DELETE",
+      headers: writeHeaders
+    }).then(function (r) { if (!r.ok) return r.text().then(function(t){throw new Error(t);}); return true; });
+  }
 
   function insertRetiro(fields) {
     return fetch(SUPABASE_URL + "/rest/v1/riftbound_retiros", {
@@ -145,6 +151,67 @@
       headers: writeHeaders
     }).then(function (r) { if (!r.ok) return r.text().then(function(t){throw new Error(t);}); return true; });
   }
+
+  // ---------- Autocompletado de imagen a partir del Card Number ----------
+  // Nota de fiabilidad: static.dotgg.gg indexa las imágenes por número de carta,
+  // y ese número puede repetirse entre sets distintos con arte diferente (mismo
+  // caveat que ya usamos en las sesiones manuales de precios). Por eso esto es
+  // "mejor esfuerzo": si detectas que alguna imagen rellenada automáticamente no
+  // coincide con la carta real, dímelo en el chat y la corrijo a mano.
+  function candidateImageUrls(cardNumber) {
+    const n = String(cardNumber).trim();
+    if (!n) return [];
+    const padded = n.length < 3 ? ('000' + n).slice(-3) : n;
+    const urls = ['https://static.dotgg.gg/riftbound/cards/' + padded + '.webp'];
+    if (padded !== n) urls.push('https://static.dotgg.gg/riftbound/cards/' + n + '.webp');
+    return urls;
+  }
+  function probeImage(url) {
+    return new Promise(function (resolve) {
+      const img = new Image();
+      img.onload = function () { resolve(url); };
+      img.onerror = function () { resolve(null); };
+      img.src = url;
+    });
+  }
+  function resolveImageForCardNumber(cardNumber) {
+    const candidates = candidateImageUrls(cardNumber);
+    if (!candidates.length) return Promise.resolve(null);
+    return candidates.reduce(function (p, url) {
+      return p.then(function (found) { return found ? found : probeImage(url); });
+    }, Promise.resolve(null));
+  }
+  function fixMissingImages() {
+    const cards = (window.portfolioData && window.portfolioData.cards) || [];
+    const targets = cards.filter(function (c) { return !c.image && c.cardNumber; });
+    if (!targets.length) {
+      window.alert('Nothing to fix: every card without an image is also missing its Card Number, so there is nothing to look up yet.');
+      return;
+    }
+    window.alert('Checking ' + targets.length + ' card(s) for images — this can take a few seconds, please wait.');
+    const chain = targets.reduce(function (p, c) {
+      return p.then(function (results) {
+        return resolveImageForCardNumber(c.cardNumber).then(function (url) {
+          if (url) {
+            return updateCard(c.dbId, { card_image: url }).then(function () { results.fixed++; return results; }).catch(function () { return results; });
+          }
+          results.skipped++;
+          return results;
+        });
+      });
+    }, Promise.resolve({ fixed: 0, skipped: 0 }));
+    chain.then(function (results) {
+      window.alert(
+        'Done — ' + results.fixed + ' image(s) filled in automatically' +
+        (results.skipped ? ', ' + results.skipped + ' still missing (no match found).' : '.') +
+        (results.fixed ? ' Please double-check the new images look right — the same card number can exist in more than one set with different art.' : '')
+      );
+      return window.CardexReload();
+    }).then(function () {
+      if (typeof window.CardexOnDataChange === 'function') window.CardexOnDataChange();
+    });
+  }
+  window.CardexFixMissingImages = function () { requirePassword(fixMissingImages); };
 
   // ---------- Estilos inyectados (menú, modales de añadir/mover) ----------
   const css = `
@@ -274,9 +341,12 @@
       '<div class="cx-side-panel">' +
         '<div class="cx-side-logo">CARDEX</div>' +
         links +
+        '<button class="cx-side-add" id="cx-side-fix-images" style="margin-top:10px;background:transparent;border:1px solid rgba(184,145,46,0.4);color:var(--gold);">Fix missing images</button>' +
       '</div>';
     document.body.appendChild(overlay);
     overlay.addEventListener('click', function (e) { if (e.target.id === 'cx-side-overlay') closeMenu(); });
+    const fixBtn = overlay.querySelector('#cx-side-fix-images');
+    if (fixBtn) fixBtn.addEventListener('click', function () { closeMenu(); window.CardexFixMissingImages(); });
 
     const header = document.querySelector('header');
     if (header) {
@@ -663,7 +733,7 @@
   }
 
   window.CardexAuth = { requirePassword: requirePassword, isUnlocked: isUnlocked };
-  window.CardexAPI = { insertCard: insertCard, updateCard: updateCard, deleteCard: deleteCard, insertRetiro: insertRetiro, deleteRetiro: deleteRetiro, insertWatchlist: insertWatchlist };
+  window.CardexAPI = { insertCard: insertCard, updateCard: updateCard, deleteCard: deleteCard, insertRetiro: insertRetiro, deleteRetiro: deleteRetiro, insertWatchlist: insertWatchlist, deleteWatchlist: deleteWatchlist };
   window.CardexOpenMove = function (item) { requirePassword(function () { openMoveModal(item); }); };
   window.CardexOpenAdd = function (status) { requirePassword(function () { openAddModal(status); }); };
   window.CardexOpenRetiro = function () { requirePassword(function () { openRetiroModal(); }); };
