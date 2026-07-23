@@ -347,28 +347,23 @@
 
 <main>
   <div class="sold-summary">
-    <div class="summary-metric clickable" id="cashed-metric" title="Total amount received from completed sales. Hover to see the breakdown.">
-      <span class="sm-label">Total Cashed Out</span>
-      <span class="sm-value" id="s-total-sold">—</span>
-      <span class="sm-sub" id="s-sale-count">no sales yet</span>
+    <div class="summary-metric clickable" id="count-metric" title="How many cards you've sold in total. Hover to see the breakdown.">
+      <span class="sm-label">Cartas Vendidas</span>
+      <span class="sm-value" id="s-sold-count-big">—</span>
+      <span class="sm-sub" id="s-sold-count-month">—</span>
+    </div>
+    <div class="summary-metric clickable" id="withdrawn-metric" title="Total sent to your savings account. Hover to see the breakdown.">
+      <span class="sm-label">Enviado a Ahorros</span>
+      <span class="sm-value" id="s-withdrawn">—</span>
+      <span class="sm-sub" id="s-withdrawn-sub">—</span>
     </div>
     <div class="summary-metric clickable" id="realized-metric" title="Realized profit or loss: total sell price minus what you originally paid, for sold items with a purchase cost. Hover to see the breakdown.">
-      <span class="sm-label">Realized P&amp;L</span>
+      <span class="sm-label">Beneficio Realizado</span>
       <span class="sm-value" id="s-realized-pnl">—</span>
       <span class="sm-sub" id="s-realized-pct">—</span>
     </div>
-    <div class="summary-metric clickable" id="avg-metric" title="Average amount received per sale. Hover to see the breakdown.">
-      <span class="sm-label">Average Sale</span>
-      <span class="sm-value" id="s-avg-sale">—</span>
-      <span class="sm-sub">per item sold</span>
-    </div>
-    <div class="summary-metric clickable" id="flow-metric" title="Total Cashed Out minus Total Invested (My Collection) — how much of your invested capital you've recovered through sales. Hover for a quick breakdown, click for full detail.">
-      <span class="sm-label">Net Capital Recovery</span>
-      <span class="sm-value" id="s-flow">—</span>
-      <span class="sm-sub" id="s-flow-sub">—</span>
-    </div>
-    <div class="summary-metric clickable span-2" id="reinvested-metric" title="Total Cashed Out minus everything you've withdrawn to your savings account — money still available to reinvest. Hover for a quick breakdown, click for full detail.">
-      <span class="sm-label">Reinvertido</span>
+    <div class="summary-metric clickable" id="reinvested-metric" title="Total Cashed Out minus everything you've withdrawn to your savings account — money still available to reinvest. Hover to see the breakdown.">
+      <span class="sm-label">Disponible para Reinvertir</span>
       <span class="sm-value" id="s-reinvested">—</span>
       <span class="sm-sub" id="s-reinvested-sub">—</span>
     </div>
@@ -439,26 +434,6 @@
         </div>
       </div>
     </div>
-  </div>
-</div>
-
-<div class="pnl-overlay" id="flow-overlay">
-  <div class="pnl-modal">
-    <div class="pnl-header">
-      <div><div class="pnl-title">Net Capital Recovery</div><span class="pnl-total-val" id="flow-total-val">—</span></div>
-      <button class="pnl-close" id="flow-close">✕</button>
-    </div>
-    <div class="pnl-list" id="flow-list"></div>
-  </div>
-</div>
-
-<div class="pnl-overlay" id="reinvested-overlay">
-  <div class="pnl-modal">
-    <div class="pnl-header">
-      <div><div class="pnl-title">Reinvertido</div><span class="pnl-total-val" id="reinvested-total-val">—</span></div>
-      <button class="pnl-close" id="reinvested-close">✕</button>
-    </div>
-    <div class="pnl-list" id="reinvested-list"></div>
   </div>
 </div>
 
@@ -669,7 +644,7 @@
   document.getElementById('modal-close-x').addEventListener('click',closeModal);
   document.getElementById('modal-edit-btn').addEventListener('click',()=>{ if(currentModalItem) window.CardexOpenMove(currentModalItem); });
   document.getElementById('modal-overlay').addEventListener('click',e=>{if(e.target.id==='modal-overlay')closeModal();});
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();['flow-overlay','reinvested-overlay'].forEach(id=>{const ov=document.getElementById(id);if(ov)ov.classList.remove('open');});closeBreakdown();}});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeBreakdown();}});
   document.querySelectorAll('#range-filters .range-btn').forEach(btn=>{
     btn.addEventListener('click',()=>{
       document.querySelectorAll('#range-filters .range-btn').forEach(b=>b.classList.remove('active'));
@@ -761,48 +736,27 @@
     const costBasis = paidSold.reduce((s,c)=>s+c.buyPrice*(c.qty||1),0);
     const realizedPnl = paidSold.reduce((s,c)=>s+(c.sellPrice-c.buyPrice)*(c.qty||1),0);
     const realizedPct = costBasis>0 ? realizedPnl/costBasis*100 : 0;
-    const avgSale = count ? totalSold/count : 0;
 
-    const holdingPaid = holding.filter(c=>c.buyPrice>0);
-    const totalInvested = holdingPaid.reduce((s,c)=>s+c.buyPrice*(c.qty||1),0);
-    const totalFlow = totalSold - totalInvested;
+    // ── CARTAS VENDIDAS ──
+    const now = new Date();
+    const thisMonthKey = now.toISOString().slice(0,7);
+    const soldThisMonth = soldItems.filter(c => c.sellDate && c.sellDate.slice(0,7) === thisMonthKey).length;
+    document.getElementById('s-sold-count-big').textContent = count;
+    document.getElementById('s-sold-count-month').textContent = count ? (soldThisMonth + (soldThisMonth===1?' este mes':' este mes')) : 'ninguna todavía';
+    document.getElementById('sold-count').textContent = count + (count===1?' item':' items');
 
-    document.getElementById('s-total-sold').textContent = fmt(totalSold);
-    document.getElementById('s-sale-count').textContent = count ? (count+(count===1?' sale':' sales')) : 'no sales yet';
     const pnlEl = document.getElementById('s-realized-pnl');
     pnlEl.textContent = paidSold.length ? fmtSign(realizedPnl) : '—';
     pnlEl.className = 'sm-value'+(paidSold.length ? (realizedPnl>=0?' pos':' neg') : '');
-    document.getElementById('s-realized-pct').textContent = paidSold.length ? fmtPct(realizedPct)+' on cost' : '—';
-    document.getElementById('s-avg-sale').textContent = count ? fmt(avgSale) : '—';
-    document.getElementById('sold-count').textContent = count + (count===1?' item':' items');
-
-    const flowEl = document.getElementById('s-flow');
-    flowEl.textContent = fmtSign(totalFlow); flowEl.className = 'sm-value '+(totalFlow>=0?'pos':'neg');
-    const flowSubEl = document.getElementById('s-flow-sub');
-    if (totalInvested>0){ const recoveredPct=Math.min(totalSold/totalInvested*100,999); flowSubEl.textContent = totalFlow>=0 ? 'fully recovered + profit' : recoveredPct.toFixed(0)+'% of investment recovered'; }
-    else { flowSubEl.textContent = 'sold − invested'; }
-    flowSubEl.className = 'sm-sub '+(totalFlow>=0?'pos':'neg');
-
-    document.getElementById('flow-metric').onclick = () => {
-      document.getElementById('flow-total-val').textContent = fmtSign(totalFlow);
-      document.getElementById('flow-total-val').style.color = totalFlow>=0?'var(--green)':'var(--red)';
-      const investedRows = holdingPaid.map(c => ({ ...c, lineValue: c.buyPrice*(c.qty||1), tag:'Invested', sign:'-', cls:'neg' }));
-      const cashedRows = soldItems.map(c => ({ ...c, lineValue: (c.sellPrice||0)*(c.qty||1), tag:'Cashed out', sign:'+', cls:'pos' }));
-      const rows = [...investedRows, ...cashedRows].sort((a,b)=>b.lineValue-a.lineValue);
-      document.getElementById('flow-list').innerHTML = rows.map(r=>`
-        <div class="simple-row">
-          <img class="simple-img" src="${r.image||''}" alt="" onerror="this.style.opacity=0.1"/>
-          <span class="simple-name">${r.name} <span style="color:var(--text-muted);font-weight:500;">(${r.tag})</span></span>
-          <span class="simple-price" style="color:${r.cls==='pos'?'var(--green)':'var(--red)'}">${r.sign}${fmt(r.lineValue)}</span>
-        </div>`).join('');
-      document.getElementById('flow-overlay').classList.add('open');
-      document.body.style.overflow='hidden';
-    };
+    document.getElementById('s-realized-pct').textContent = paidSold.length ? fmtPct(realizedPct)+' sobre coste' : '—';
 
     // ── RETIROS A AHORROS ──
     const retiros = window.portfolioData.retiros || [];
     const retirosTotal = window.portfolioData.retirosTotal || 0;
     const reinvested = totalSold - retirosTotal;
+
+    document.getElementById('s-withdrawn').textContent = fmt(retirosTotal);
+    document.getElementById('s-withdrawn-sub').textContent = retiros.length ? (retiros.length+(retiros.length===1?' retiro':' retiros')) : 'ninguno todavía';
 
     const reinvEl = document.getElementById('s-reinvested');
     reinvEl.textContent = fmt(reinvested); reinvEl.className = 'sm-value '+(reinvested>=0?'pos':'neg');
@@ -823,22 +777,6 @@
         });
       };
     });
-
-    document.getElementById('reinvested-metric').onclick = () => {
-      document.getElementById('reinvested-total-val').textContent = fmt(reinvested);
-      document.getElementById('reinvested-total-val').style.color = reinvested>=0?'var(--green)':'var(--red)';
-      const cashedRows = soldItems.map(c => ({ image:c.image, name:c.name, lineValue:(c.sellPrice||0)*(c.qty||1), tag:'Cashed out', sign:'+', cls:'pos' }));
-      const withdrawalRows = retiros.map(r => ({ image:'', name:r.notes||'Retiro a ahorros', lineValue:Number(r.amount), tag:new Date(r.withdrawal_date+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}), sign:'-', cls:'neg' }));
-      const rows = [...cashedRows, ...withdrawalRows].sort((a,b)=>b.lineValue-a.lineValue);
-      document.getElementById('reinvested-list').innerHTML = rows.map(r=>`
-        <div class="simple-row">
-          <img class="simple-img" src="${r.image||''}" alt="" onerror="this.style.opacity=0.1"/>
-          <span class="simple-name">${r.name} <span style="color:var(--text-muted);font-weight:500;">(${r.tag})</span></span>
-          <span class="simple-price" style="color:${r.cls==='pos'?'var(--green)':'var(--red)'}">${r.sign}${fmt(r.lineValue)}</span>
-        </div>`).join('');
-      document.getElementById('reinvested-overlay').classList.add('open');
-      document.body.style.overflow='hidden';
-    };
     document.getElementById('add-withdrawal-btn').onclick = () => window.CardexOpenRetiro();
 
     if (!count){
@@ -852,35 +790,28 @@
     // ── DATOS PARA EL BREAKDOWN AL PASAR EL RATÓN (igual que en Overview) ──
     const dateTxt = d => d ? new Date(d+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '—';
     currentMetricsData = {
-      'cashed-metric': {
-        title: 'Total Cashed Out',
-        total: fmt(totalSold),
+      'count-metric': {
+        title: 'Cartas Vendidas',
+        total: count + (count===1?' carta':' cartas'),
         rows: soldItems.map(c => ({ item:c, v:(c.sellPrice||0)*(c.qty||1),
           m1:{label:'Sell Price', value: fmt((c.sellPrice||0)*(c.qty||1))},
-          m2:{label:'Sell Date', value: dateTxt(c.sellDate)} })).sort((a,b)=>b.v-a.v)
+          m2:{label:'Sell Date', value: dateTxt(c.sellDate)} })).sort((a,b)=>(b.item.sellDate||'').localeCompare(a.item.sellDate||''))
+      },
+      'withdrawn-metric': {
+        title: 'Enviado a Ahorros',
+        total: fmt(retirosTotal),
+        rows: retiros.map(r => ({ item:{ image:'', name:r.notes||'Retiro a ahorros', cardmarketUrl:null }, v:Number(r.amount),
+          m1:{label:'Importe', value:fmt(Number(r.amount))},
+          m2:{label:'Fecha', value:dateTxt(r.withdrawal_date)} })).sort((a,b)=>b.v-a.v)
       },
       'realized-metric': {
-        title: 'Realized P&L',
+        title: 'Beneficio Realizado',
         total: paidSold.length ? fmtSign(realizedPnl) : '—',
         rows: paidSold.map(c => { const eur=(c.sellPrice-c.buyPrice)*(c.qty||1); const pct = c.buyPrice ? (c.sellPrice-c.buyPrice)/c.buyPrice*100 : 0;
           return { item:c, v:eur, m1:{label:'P&L €', value:fmtSign(eur), cls:eur>=0?'pos':'neg'}, m2:{label:'P&L %', value:fmtPct(pct), cls:pct>=0?'pos':'neg'} }; }).sort((a,b)=>b.v-a.v)
       },
-      'avg-metric': {
-        title: 'Average Sale',
-        total: count ? fmt(avgSale) : '—',
-        rows: soldItems.map(c => { const lv=(c.sellPrice||0)*(c.qty||1); const diff=lv-avgSale;
-          return { item:c, v:lv, m1:{label:'Sell Price', value: fmt(lv)}, m2:{label:'vs Average', value:(diff>=0?'+':'')+fmt(diff), cls:diff>=0?'pos':'neg'} }; }).sort((a,b)=>b.v-a.v)
-      },
-      'flow-metric': {
-        title: 'Net Capital Recovery',
-        total: fmtSign(totalFlow),
-        rows: [
-          ...holdingPaid.map(c => ({ item:c, v:-(c.buyPrice*(c.qty||1)), m1:{label:'Invested', value:'-'+fmt(c.buyPrice*(c.qty||1)), cls:'neg'}, m2:{label:'Status', value:'Holding'} })),
-          ...soldItems.map(c => ({ item:c, v:(c.sellPrice||0)*(c.qty||1), m1:{label:'Cashed out', value:'+'+fmt((c.sellPrice||0)*(c.qty||1)), cls:'pos'}, m2:{label:'Status', value:'Sold'} }))
-        ].sort((a,b)=>b.v-a.v)
-      },
       'reinvested-metric': {
-        title: 'Reinvertido',
+        title: 'Disponible para Reinvertir',
         total: fmt(reinvested),
         rows: [
           ...soldItems.map(c => ({ item:c, v:(c.sellPrice||0)*(c.qty||1), m1:{label:'Cashed out', value:'+'+fmt((c.sellPrice||0)*(c.qty||1)), cls:'pos'}, m2:{label:'', value:''} })),
@@ -899,10 +830,6 @@
     const upd = window.portfolioData.updatedAt;
     if (upd) document.getElementById('updated-label').textContent = 'Updated ' + new Date(upd+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
   }
-  document.getElementById('flow-close').addEventListener('click', ()=>{ document.getElementById('flow-overlay').classList.remove('open'); document.body.style.overflow=''; });
-  document.getElementById('flow-overlay').addEventListener('click', e=>{ if(e.target.id==='flow-overlay'){ document.getElementById('flow-overlay').classList.remove('open'); document.body.style.overflow=''; } });
-  document.getElementById('reinvested-close').addEventListener('click', ()=>{ document.getElementById('reinvested-overlay').classList.remove('open'); document.body.style.overflow=''; });
-  document.getElementById('reinvested-overlay').addEventListener('click', e=>{ if(e.target.id==='reinvested-overlay'){ document.getElementById('reinvested-overlay').classList.remove('open'); document.body.style.overflow=''; } });
   window.CardexOnDataChange = renderPage;
   window.__portfolioDataPromise.then(renderPage);
 })();
