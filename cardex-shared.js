@@ -169,8 +169,11 @@
   function probeImage(url) {
     return new Promise(function (resolve) {
       const img = new Image();
-      img.onload = function () { resolve(url); };
-      img.onerror = function () { resolve(null); };
+      let done = false;
+      const finish = function (result) { if (!done) { done = true; resolve(result); } };
+      img.onload = function () { finish(url); };
+      img.onerror = function () { finish(null); };
+      setTimeout(function () { finish(null); }, 6000); // por si la petición se queda colgada sin disparar onload/onerror
       img.src = url;
     });
   }
@@ -193,19 +196,27 @@
       return p.then(function (results) {
         return resolveImageForCardNumber(c.cardNumber).then(function (url) {
           if (url) {
-            return updateCard(c.dbId, { card_image: url }).then(function () { results.fixed++; return results; }).catch(function () { return results; });
+            return updateCard(c.dbId, { card_image: url }).then(function () { results.fixed++; return results; }).catch(function (err) {
+              results.errors.push(c.name + ' (' + c.cardNumber + '): ' + err.message);
+              return results;
+            });
           }
-          results.skipped++;
+          results.skippedNames.push(c.name + ' (' + c.cardNumber + ')');
           return results;
         });
       });
-    }, Promise.resolve({ fixed: 0, skipped: 0 }));
+    }, Promise.resolve({ fixed: 0, skippedNames: [], errors: [] }));
     chain.then(function (results) {
-      window.alert(
-        'Done — ' + results.fixed + ' image(s) filled in automatically' +
-        (results.skipped ? ', ' + results.skipped + ' still missing (no match found).' : '.') +
-        (results.fixed ? ' Please double-check the new images look right — the same card number can exist in more than one set with different art.' : '')
-      );
+      let msg = 'Done — ' + results.fixed + ' image(s) filled in automatically.';
+      if (results.skippedNames.length) {
+        msg += '\n\nNo match found for:\n' + results.skippedNames.join('\n') +
+          '\n\nTell Claude in chat about these — dotgg.gg doesn\'t have them, but they can usually be found on tcggo.com and added by hand.';
+      }
+      if (results.errors.length) {
+        msg += '\n\nCould not save to Supabase:\n' + results.errors.join('\n');
+      }
+      if (results.fixed) msg += '\n\nPlease double-check the new images look right — the same card number can exist in more than one set with different art.';
+      window.alert(msg);
       return window.CardexReload();
     }).then(function () {
       if (typeof window.CardexOnDataChange === 'function') window.CardexOnDataChange();

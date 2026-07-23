@@ -62,6 +62,25 @@
     .summary-metric.clickable { cursor:pointer; transition:border-color 0.2s, background 0.2s, box-shadow 0.2s; }
     .summary-metric.clickable:hover { border-color:rgba(184,145,46,0.56); background:rgba(20,20,20,0.06); box-shadow:0 4px 16px rgba(0,0,0,0.5),0 0 16px rgba(184,145,46,0.16),inset 0 1px 0 rgba(255,255,255,0.07); }
 
+    /* BREAKDOWN POPOVER (pequeño, anclado a la métrica, se cierra solo al sacar el ratón) — igual que en Overview */
+    .breakdown-popover { position:fixed; z-index:150; width:320px; max-width:92vw; max-height:340px; overflow-y:auto; background:rgba(14,14,14,0.97); border:1px solid rgba(184,145,46,0.4); border-radius:12px; padding:12px 14px 8px; box-shadow:0 18px 44px rgba(0,0,0,0.75),0 0 0 1px rgba(255,255,255,0.05),0 0 24px rgba(184,145,46,0.12); backdrop-filter:blur(16px); display:none; opacity:0; transform:translateY(-4px); transition:opacity 0.12s ease, transform 0.12s ease; scrollbar-width:none; -ms-overflow-style:none; }
+    .breakdown-popover::-webkit-scrollbar { display:none; }
+    .breakdown-popover.open { display:block; }
+    .breakdown-popover.show { opacity:1; transform:translateY(0); }
+    .bp-title { font-size:13px; font-weight:800; margin-bottom:1px; }
+    .bp-subtitle { font-size:10.5px; color:var(--text-muted); font-weight:600; margin-bottom:8px; }
+    .bp-list { display:flex; flex-direction:column; gap:2px; }
+    .breakdown-row { display:flex; align-items:center; gap:10px; padding:8px 6px; border-radius:8px; text-decoration:none; color:inherit; transition:background 0.12s; }
+    .breakdown-row:hover { background:rgba(184,145,46,0.08); }
+    .breakdown-row img { width:30px; height:30px; border-radius:5px; object-fit:contain; background:#050505; flex-shrink:0; }
+    .breakdown-name { flex:1; min-width:0; font-size:12.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .breakdown-metrics { display:flex; gap:16px; flex-shrink:0; }
+    .breakdown-metric { text-align:right; min-width:64px; }
+    .breakdown-metric-label { font-size:8.5px; text-transform:uppercase; color:var(--text-muted); letter-spacing:0.05em; }
+    .breakdown-metric-value { font-size:12px; font-weight:700; }
+    .breakdown-metric-value.pos { color:var(--green); } .breakdown-metric-value.neg { color:var(--red); }
+    .empty-mini { font-size:11.5px; color:var(--text-muted); padding:10px 2px; }
+
     /* VIEW TOGGLE (Grid / List) */
     .view-toggle { display:flex; gap:6px; margin-bottom:14px; }
     .view-toggle-btn { font-size:12px; font-weight:700; padding:6px 14px; border-radius:7px; border:1px solid rgba(184,145,46,0.28); background:rgba(10,10,10,0.55); color:var(--text-muted); cursor:pointer; transition:all 0.15s; display:flex; align-items:center; gap:6px; }
@@ -328,27 +347,27 @@
 
 <main>
   <div class="sold-summary">
-    <div class="summary-metric" title="Total amount received from completed sales.">
+    <div class="summary-metric clickable" id="cashed-metric" title="Total amount received from completed sales. Hover to see the breakdown.">
       <span class="sm-label">Total Cashed Out</span>
       <span class="sm-value" id="s-total-sold">—</span>
       <span class="sm-sub" id="s-sale-count">no sales yet</span>
     </div>
-    <div class="summary-metric" title="Realized profit or loss: total sell price minus what you originally paid, for sold items with a purchase cost.">
+    <div class="summary-metric clickable" id="realized-metric" title="Realized profit or loss: total sell price minus what you originally paid, for sold items with a purchase cost. Hover to see the breakdown.">
       <span class="sm-label">Realized P&amp;L</span>
       <span class="sm-value" id="s-realized-pnl">—</span>
       <span class="sm-sub" id="s-realized-pct">—</span>
     </div>
-    <div class="summary-metric" title="Average amount received per sale.">
+    <div class="summary-metric clickable" id="avg-metric" title="Average amount received per sale. Hover to see the breakdown.">
       <span class="sm-label">Average Sale</span>
       <span class="sm-value" id="s-avg-sale">—</span>
       <span class="sm-sub">per item sold</span>
     </div>
-    <div class="summary-metric clickable" id="flow-metric" title="Total Cashed Out minus Total Invested (My Collection) — how much of your invested capital you've recovered through sales. Click for a breakdown.">
+    <div class="summary-metric clickable" id="flow-metric" title="Total Cashed Out minus Total Invested (My Collection) — how much of your invested capital you've recovered through sales. Hover for a quick breakdown, click for full detail.">
       <span class="sm-label">Net Capital Recovery</span>
       <span class="sm-value" id="s-flow">—</span>
       <span class="sm-sub" id="s-flow-sub">—</span>
     </div>
-    <div class="summary-metric clickable span-2" id="reinvested-metric" title="Total Cashed Out minus everything you've withdrawn to your savings account — money still available to reinvest. Click for a breakdown.">
+    <div class="summary-metric clickable span-2" id="reinvested-metric" title="Total Cashed Out minus everything you've withdrawn to your savings account — money still available to reinvest. Hover for a quick breakdown, click for full detail.">
       <span class="sm-label">Reinvertido</span>
       <span class="sm-value" id="s-reinvested">—</span>
       <span class="sm-sub" id="s-reinvested-sub">—</span>
@@ -443,6 +462,12 @@
   </div>
 </div>
 
+<div class="breakdown-popover" id="breakdown-overlay">
+  <div class="bp-title" id="breakdown-title"></div>
+  <div class="bp-subtitle" id="breakdown-subtitle"></div>
+  <div id="breakdown-list" class="bp-list"></div>
+</div>
+
 <script>
 </script>
 <script src="cardex-shared.js"></script>
@@ -453,6 +478,61 @@
   const fmtPct  = n => (n>=0?'+':'')+n.toFixed(1)+'%';
   const badgeClass = s => ({Origins:'badge-origins',Unleashed:'badge-unleashed',Spiritforged:'badge-spiritforged','Proving Grounds':'badge-proving'}[s]||'badge-default');
   const cmUrl = item => item.cardmarketUrl || 'https://www.cardmarket.com/en/Riftbound/Products/Search?searchString='+encodeURIComponent(item.name);
+
+  // ── BREAKDOWN AL PASAR EL RATÓN (mismo mecanismo que Overview) ──
+  let currentMetricsData = {};
+  let breakdownHoverTimer = null;
+  function showBreakdownHover(id, anchorEl){
+    clearTimeout(breakdownHoverTimer);
+    openBreakdown(id, anchorEl);
+  }
+  function scheduleBreakdownClose(){
+    clearTimeout(breakdownHoverTimer);
+    breakdownHoverTimer = setTimeout(closeBreakdown, 120);
+  }
+  function positionBreakdownPopover(pop, anchorEl){
+    if (!anchorEl) return;
+    const r = anchorEl.getBoundingClientRect();
+    const margin = 10;
+    let left = r.left;
+    let top = r.bottom + 8;
+    const popW = pop.offsetWidth || 320;
+    const popH = pop.offsetHeight || 220;
+    if (left + popW > window.innerWidth - margin) left = window.innerWidth - popW - margin;
+    if (left < margin) left = margin;
+    if (top + popH > window.innerHeight - margin) {
+      const above = r.top - popH - 8;
+      top = above > margin ? above : Math.max(margin, window.innerHeight - popH - margin);
+    }
+    pop.style.left = left + 'px';
+    pop.style.top = top + 'px';
+  }
+  function openBreakdown(id, anchorEl){
+    const m = currentMetricsData[id];
+    if (!m) return;
+    document.getElementById('breakdown-title').textContent = m.title;
+    document.getElementById('breakdown-subtitle').textContent = 'Total: ' + m.total;
+    const rows = m.rows;
+    document.getElementById('breakdown-list').innerHTML = rows.length ? rows.map(r => `
+      <a class="breakdown-row" href="${cmUrl(r.item)}" target="_blank" rel="noopener">
+        <img src="${r.item.image||''}" alt="" onerror="this.style.opacity=0.1"/>
+        <span class="breakdown-name">${r.item.name}</span>
+        <div class="breakdown-metrics">
+          <div class="breakdown-metric"><div class="breakdown-metric-label">${r.m1.label}</div><div class="breakdown-metric-value ${r.m1.cls||''}">${r.m1.value}</div></div>
+          <div class="breakdown-metric"><div class="breakdown-metric-label">${r.m2.label}</div><div class="breakdown-metric-value ${r.m2.cls||''}">${r.m2.value}</div></div>
+        </div>
+      </a>`).join('') : '<div class="empty-mini">Nothing here yet.</div>';
+    const pop = document.getElementById('breakdown-overlay');
+    pop.classList.add('open');
+    positionBreakdownPopover(pop, anchorEl);
+    requestAnimationFrame(()=>{ positionBreakdownPopover(pop, anchorEl); pop.classList.add('show'); });
+  }
+  function closeBreakdown(){
+    const pop = document.getElementById('breakdown-overlay');
+    pop.classList.remove('open','show');
+  }
+  document.getElementById('breakdown-overlay').addEventListener('mouseenter', ()=>clearTimeout(breakdownHoverTimer));
+  document.getElementById('breakdown-overlay').addEventListener('mouseleave', scheduleBreakdownClose);
   function ebaySoldUrl(item){
     let q=(item.name||'').replace(/^(OGN|OGNX|UNL|SFD|PROK)\s+/,'').replace(/[()—–,*×]/g,' ').replace(/\s+/g,' ').trim();
     q='Riftbound '+q;
@@ -589,7 +669,7 @@
   document.getElementById('modal-close-x').addEventListener('click',closeModal);
   document.getElementById('modal-edit-btn').addEventListener('click',()=>{ if(currentModalItem) window.CardexOpenMove(currentModalItem); });
   document.getElementById('modal-overlay').addEventListener('click',e=>{if(e.target.id==='modal-overlay')closeModal();});
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();['flow-overlay','reinvested-overlay'].forEach(id=>{const ov=document.getElementById(id);if(ov)ov.classList.remove('open');});}});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();['flow-overlay','reinvested-overlay'].forEach(id=>{const ov=document.getElementById(id);if(ov)ov.classList.remove('open');});closeBreakdown();}});
   document.querySelectorAll('#range-filters .range-btn').forEach(btn=>{
     btn.addEventListener('click',()=>{
       document.querySelectorAll('#range-filters .range-btn').forEach(b=>b.classList.remove('active'));
@@ -768,6 +848,53 @@
     }
 
     renderOpportunities(holding);
+
+    // ── DATOS PARA EL BREAKDOWN AL PASAR EL RATÓN (igual que en Overview) ──
+    const dateTxt = d => d ? new Date(d+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '—';
+    currentMetricsData = {
+      'cashed-metric': {
+        title: 'Total Cashed Out',
+        total: fmt(totalSold),
+        rows: soldItems.map(c => ({ item:c, v:(c.sellPrice||0)*(c.qty||1),
+          m1:{label:'Sell Price', value: fmt((c.sellPrice||0)*(c.qty||1))},
+          m2:{label:'Sell Date', value: dateTxt(c.sellDate)} })).sort((a,b)=>b.v-a.v)
+      },
+      'realized-metric': {
+        title: 'Realized P&L',
+        total: paidSold.length ? fmtSign(realizedPnl) : '—',
+        rows: paidSold.map(c => { const eur=(c.sellPrice-c.buyPrice)*(c.qty||1); const pct = c.buyPrice ? (c.sellPrice-c.buyPrice)/c.buyPrice*100 : 0;
+          return { item:c, v:eur, m1:{label:'P&L €', value:fmtSign(eur), cls:eur>=0?'pos':'neg'}, m2:{label:'P&L %', value:fmtPct(pct), cls:pct>=0?'pos':'neg'} }; }).sort((a,b)=>b.v-a.v)
+      },
+      'avg-metric': {
+        title: 'Average Sale',
+        total: count ? fmt(avgSale) : '—',
+        rows: soldItems.map(c => { const lv=(c.sellPrice||0)*(c.qty||1); const diff=lv-avgSale;
+          return { item:c, v:lv, m1:{label:'Sell Price', value: fmt(lv)}, m2:{label:'vs Average', value:(diff>=0?'+':'')+fmt(diff), cls:diff>=0?'pos':'neg'} }; }).sort((a,b)=>b.v-a.v)
+      },
+      'flow-metric': {
+        title: 'Net Capital Recovery',
+        total: fmtSign(totalFlow),
+        rows: [
+          ...holdingPaid.map(c => ({ item:c, v:-(c.buyPrice*(c.qty||1)), m1:{label:'Invested', value:'-'+fmt(c.buyPrice*(c.qty||1)), cls:'neg'}, m2:{label:'Status', value:'Holding'} })),
+          ...soldItems.map(c => ({ item:c, v:(c.sellPrice||0)*(c.qty||1), m1:{label:'Cashed out', value:'+'+fmt((c.sellPrice||0)*(c.qty||1)), cls:'pos'}, m2:{label:'Status', value:'Sold'} }))
+        ].sort((a,b)=>b.v-a.v)
+      },
+      'reinvested-metric': {
+        title: 'Reinvertido',
+        total: fmt(reinvested),
+        rows: [
+          ...soldItems.map(c => ({ item:c, v:(c.sellPrice||0)*(c.qty||1), m1:{label:'Cashed out', value:'+'+fmt((c.sellPrice||0)*(c.qty||1)), cls:'pos'}, m2:{label:'', value:''} })),
+          ...retiros.map(r => ({ item:{ image:'', name:r.notes||'Retiro a ahorros', cardmarketUrl:null }, v:-Number(r.amount), m1:{label:'Retiro', value:'-'+fmt(Number(r.amount)), cls:'neg'}, m2:{label:'Fecha', value:dateTxt(r.withdrawal_date)} }))
+        ].sort((a,b)=>b.v-a.v)
+      }
+    };
+    Object.keys(currentMetricsData).forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.onmouseenter = () => showBreakdownHover(id, el);
+        el.onmouseleave = () => scheduleBreakdownClose();
+      }
+    });
 
     const upd = window.portfolioData.updatedAt;
     if (upd) document.getElementById('updated-label').textContent = 'Updated ' + new Date(upd+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
