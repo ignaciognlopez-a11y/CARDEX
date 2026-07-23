@@ -263,7 +263,7 @@ function render() {
     const newPriceTxt = isDone ? (newPriceNum != null ? newPriceNum.toLocaleString('de-DE',{minimumFractionDigits:2}) + ' €' : '—') : '—';
     const pctTxt = (isDone && info._pct != null) ? `<span class="growth-pct ${info._pct>=0?'up':'down'}">${info._pct>=0?'+':''}${info._pct.toFixed(1)}%</span>` : '';
     return `<tr data-url="${url}">
-      <td class="name"><div class="name-cell"><img class="row-thumb" src="${info.image || FALLBACK_IMG}" onerror="this.src='${FALLBACK_IMG}'"/><span>${info.name}</span></div></td>
+      <td class="name"><div class="name-cell"><a href="${url}" target="_blank" rel="noopener" title="Abrir en Cardmarket"><img class="row-thumb" src="${info.image || FALLBACK_IMG}" onerror="this.src='${FALLBACK_IMG}'" style="cursor:pointer;"/></a><span>${info.name}</span></div></td>
       <td>${info.set || '—'} ${info.ids.length > 1 ? '<span class="badge">x' + info.ids.length + '</span>' : ''}</td>
       <td>${priceTxt}</td>
       <td class="${newPriceClass}">${newPriceTxt}${pctTxt}</td>

@@ -562,6 +562,7 @@
       <td>${dateTxt}</td>
       <td class="ht-pnl ${pnlCls}">${pnlTxt}</td>
       <td class="ht-link"><a href="${cmUrl(item)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="View on Cardmarket">↗</a></td>
+      <td><button class="cx-card-delete-x" style="position:static;" title="Delete card" onclick="event.stopPropagation(); window.CardexQuickDelete('${item.dbId}', '${item.name.replace(/'/g,"\\'")}')">✕</button></td>
     </tr>`;
   }
 
@@ -580,6 +581,7 @@
               <th data-sort="sellDate">Sell Date</th>
               <th data-sort="pnl" style="text-align:right">Realized P&amp;L</th>
               <th style="text-align:center">Link</th>
+              <th style="text-align:center"></th>
             </tr>
           </thead>
           <tbody>${sorted.map(buildRow).join('')}</tbody>

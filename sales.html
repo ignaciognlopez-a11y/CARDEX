@@ -624,7 +624,7 @@
     const netCls = netEur === null ? '' : (pos ? 'pos' : 'neg');
     const netTxt = netEur === null ? '—' : fmtSign(netEur);
     return `<div class="card" data-id="${item.id}">
-      <div class="card-cover"><img src="${item.image||''}" alt="${item.name}" loading="lazy" onerror="this.style.opacity='0.08'"/></div>
+      <div class="card-cover"><img src="${item.image||''}" alt="${item.name}" loading="lazy" onerror="this.style.opacity='0.08'"/><button class="cx-card-delete-x" title="Delete card" onclick="event.stopPropagation(); window.CardexQuickDelete('${item.dbId}', '${item.name.replace(/'/g,"\\'")}')">✕</button></div>
       <div class="card-body">
         <div class="card-badge-row">${item.set?`<span class="badge ${badgeClass(item.set)}">${item.set}</span>`:''}</div>
         <div class="card-name">${item.name}</div>

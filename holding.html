@@ -522,7 +522,7 @@
     const varArrow=isPos?'▲':pnl!==null?'▼':'';
     const varTxt=pct!==null?((pct>=0?'+':'')+pct.toFixed(1)+'%'):'';
     return `<div class="card" data-id="${item.id}">
-      <div class="card-cover"><img src="${item.image}" alt="${item.name}" loading="lazy" onerror="this.style.opacity='0.08'"/><span class="pill ${pillCls}">${pillTxt}</span><div class="card-gloss"></div></div>
+      <div class="card-cover"><img src="${item.image}" alt="${item.name}" loading="lazy" onerror="this.style.opacity='0.08'"/><span class="pill ${pillCls}">${pillTxt}</span><div class="card-gloss"></div><button class="cx-card-delete-x" title="Delete card" onclick="event.stopPropagation(); window.CardexQuickDelete('${item.dbId}', '${item.name.replace(/'/g,"\\'")}')">✕</button></div>
       <div class="card-body">
         <div class="card-badge-row">${item.set?`<span class="badge ${badgeClass(item.set)}">${item.set}</span>`:''}${item.condition==='Sealed'?`<span class="badge badge-sealed-tag">Sealed</span>`:''}</div>
         <div class="card-name">${item.name}</div>

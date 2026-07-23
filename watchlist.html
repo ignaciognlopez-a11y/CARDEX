@@ -522,6 +522,7 @@
       <div class="card-cover">
         <img src="${imgSrc}" alt="${item.name}" loading="lazy" onerror="this.src='${FALLBACK_IMG}'"/>
         <div class="card-gloss"></div>
+        <button class="cx-card-delete-x" title="Delete card" onclick="event.stopPropagation(); window.CardexQuickDelete('${item.dbId}', '${item.name.replace(/'/g,"\\'")}')">✕</button>
       </div>
       <div class="card-body">
         <div class="card-badge-row">
@@ -559,10 +560,12 @@
       + '<span class="list-price">' + fmt(item.currentPrice) + '</span>'
       + '<span class="list-var ' + varCls + '">' + varTxt + '</span>'
       + '<a class="list-buy" href="' + url + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">Buy</a>'
+      + '<button class="cx-card-delete-x" style="position:static;margin-left:6px;" title="Delete card" onclick="event.stopPropagation(); window.CardexQuickDelete(\'' + item.dbId + '\', \'' + item.name.replace(/'/g,"\\'") + '\')">✕</button>'
       + '</div>';
   }
 
   let activeWatchlist = (function () { try { return localStorage.getItem('cdx_active_watchlist') || 'General'; } catch(e) { return 'General'; } })();
+  window.CardexActiveWatchlist = function () { return activeWatchlist; };
 
   function renderTabs() {
     const names = (window.portfolioData && window.portfolioData.watchlists) || ['General'];

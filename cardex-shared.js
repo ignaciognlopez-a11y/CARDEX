@@ -238,7 +238,10 @@
   .cx-form-row label{font-size:10.5px;text-transform:uppercase;letter-spacing:0.06em;color:#9a9a9a;font-weight:700;}
   .cx-form-row input,.cx-form-row select{background:rgba(255,255,255,0.05);border:1px solid rgba(184,145,46,0.25);border-radius:7px;padding:8px 10px;color:#f2f2f2;font-size:13px;font-family:inherit;}
   .cx-form-row input:focus,.cx-form-row select:focus{outline:none;border-color:#b8912e;}
+  .cx-form-row select option{background:#161616;color:#f2f2f2;}
   .cx-form-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .cx-card-delete-x{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:rgba(10,10,10,0.85);border:1px solid rgba(255,255,255,0.15);color:#c9c9c9;font-size:12px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:5;transition:color 0.15s,border-color 0.15s,background 0.15s;}
+  .cx-card-delete-x:hover{color:#ff6b6b;border-color:rgba(255,107,107,0.5);background:rgba(40,10,10,0.9);}
   .cx-form-status-tabs{display:flex;gap:6px;margin-bottom:14px;}
   .cx-status-tab{flex:1;text-align:center;padding:8px;border-radius:7px;border:1px solid rgba(184,145,46,0.25);background:rgba(255,255,255,0.03);color:#9a9a9a;font-size:12.5px;font-weight:700;cursor:pointer;}
   .cx-status-tab.active{background:#b8912e;color:#000;border-color:#b8912e;}
@@ -318,6 +321,16 @@
     let p = location.pathname.split('/').pop();
     if (!p) p = 'index.html';
     return p;
+  }
+
+  function defaultWatchlistName() {
+    try {
+      if (typeof window.CardexActiveWatchlist === 'function') {
+        const n = window.CardexActiveWatchlist();
+        if (n) return n;
+      }
+    } catch (e) {}
+    return 'General';
   }
 
   function defaultStatusForPage() {
@@ -550,7 +563,7 @@
         '<div class="cx-form-row"><label>Cardmarket link</label><input type="text" id="cx-f-url" placeholder="https://www.cardmarket.com/en/Riftbound/Products/..."/></div>' +
         (showPrice ? '<div class="cx-form-row"><label>' + priceLabel + '</label><input type="number" step="0.01" id="cx-f-price"/></div>' : '') +
         (showCondition ? '<div class="cx-form-row"><label>Condition</label><select id="cx-f-condition">' + conditionOptionsHtml('NM') + '</select></div>' : '') +
-        (status === 'Watchlist' ? '<div class="cx-form-row"><label>Watchlist</label><select id="cx-f-watchlist">' + watchlistOptionsHtml('General') + '</select></div>' : '') +
+        (status === 'Watchlist' ? '<div class="cx-form-row"><label>Watchlist</label><select id="cx-f-watchlist">' + watchlistOptionsHtml(defaultWatchlistName()) + '</select></div>' : '') +
         '<div style="font-size:11px;color:var(--text-muted);margin:2px 0 10px;line-height:1.4;">Card name and set are guessed from the link — you can refine them anytime from chat. The image fills in automatically later, no need to add it here.</div>' +
         '<div class="cx-form-error" id="cx-form-error"></div>' +
         '<div class="cx-form-actions">' +
@@ -737,6 +750,19 @@
   window.CardexOpenMove = function (item) { requirePassword(function () { openMoveModal(item); }); };
   window.CardexOpenAdd = function (status) { requirePassword(function () { openAddModal(status); }); };
   window.CardexOpenRetiro = function () { requirePassword(function () { openRetiroModal(); }); };
+  window.CardexQuickDelete = function (dbId, name) {
+    requirePassword(function () {
+      if (!window.confirm('Are you sure you want to delete «' + (name || 'this card') + '»? This action cannot be undone.')) return;
+      deleteCard(dbId).then(function () {
+        return window.CardexReload();
+      }).then(function () {
+        if (typeof window.CardexOnDataChange === 'function') window.CardexOnDataChange();
+        else window.location.reload();
+      }).catch(function (err) {
+        window.alert('Error deleting: ' + err.message);
+      });
+    });
+  };
 
   // ---------- Atajo de teclado para añadir carta desde cualquier página ----------
   // Windows / Linux: Ctrl+Shift+A · Mac: Cmd+Shift+A (metaKey cubre la tecla Cmd)
