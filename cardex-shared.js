@@ -419,9 +419,21 @@
   // equivale en la práctica al precio de esa condición concreta.
   const CONDITION_OPTIONS = ['NM', 'EX', 'GD', 'LP', 'PL'];
   const CONDITION_MIN_MAP = { MT: 1, NM: 2, EX: 3, GD: 4, LP: 5, PL: 6, PO: 7 };
+  // Categoría real de Cardmarket para Riftbound: el primer segmento después de
+  // "Products" en la ruta (Singles, Box-Sets, Booster-Boxes, Boosters, Bundles,
+  // Starter-Decks, Playmats, Albums, Sleeves, Deck-Boxes...). Cardmarket NO usa
+  // literalmente la palabra "Sealed" en ninguna URL — solo "Singles" identifica
+  // cartas sueltas; todo lo demás es, a efectos de este tracker, "sellado".
+  function getCardmarketCategory(url) {
+    try {
+      const parts = new URL(url).pathname.split('/').filter(Boolean);
+      const pIdx = parts.indexOf('Products');
+      return (pIdx !== -1 && parts[pIdx + 1]) ? parts[pIdx + 1] : null;
+    } catch (e) { return null; }
+  }
   function isSealedUrl(url) {
-    try { return new URL(url).pathname.split('/').filter(Boolean).indexOf('Sealed') !== -1; }
-    catch (e) { return false; }
+    const cat = getCardmarketCategory(url);
+    return cat ? cat !== 'Singles' : false;
   }
   // Reescribe el parámetro minCondition de una cardmarket_url ya normalizada
   // para que refleje la condición física elegida (NM, EX, ...). No toca nada si es sellado.
@@ -492,7 +504,7 @@
       const parts = u.pathname.split('/').filter(Boolean);
       if (parts[0] && parts[0].length === 2) parts[0] = 'en'; // /es/, /de/, etc. -> /en/
       u.pathname = '/' + parts.join('/');
-      const isSealed = parts.indexOf('Sealed') !== -1;
+      const isSealed = isSealedUrl(u.toString());
       const existingLanguage = u.searchParams.get('language');
       const params = new URLSearchParams();
       params.set('language', existingLanguage || '1'); // respeta language=6 si ya lo trae (p.ej. Project K Promos)
@@ -510,9 +522,9 @@
     try {
       const u = new URL(url);
       const parts = u.pathname.split('/').filter(Boolean);
-      const idx = parts.findIndex(function (p) { return p === 'Singles' || p === 'Sealed'; });
-      const type = idx >= 0 ? parts[idx] : null;
-      const setSeg = idx >= 0 ? parts[idx + 1] : null;
+      const pIdx = parts.indexOf('Products');
+      const category = pIdx !== -1 ? parts[pIdx + 1] : null;
+      const setSeg = (category === 'Singles') ? parts[pIdx + 2] : null;
       const slug = parts[parts.length - 1] || '';
       const nameGuess = decodeURIComponent(slug).replace(/-/g, ' ').trim();
       let setGuess = '';
@@ -521,8 +533,7 @@
         const match = SET_OPTIONS.find(function (s) { return s.toLowerCase() === norm; });
         if (match) setGuess = match;
       }
-      const hasMinCondition = /minCondition=/.test(u.search);
-      const condition = type === 'Sealed' ? 'Sealed' : (hasMinCondition ? 'NM' : '');
+      const condition = (category && category !== 'Singles') ? 'Sealed' : 'NM';
       return { name: nameGuess, set: setGuess, condition: condition };
     } catch (e) {
       return { name: '', set: '', condition: '' };
@@ -607,16 +618,24 @@
   // petición a Supabase con un array de filas (PostgREST inserta varias filas
   // de golpe si el body es un array), en vez de una petición por carta.
   // Valida que el enlace sea realmente una página de producto de Cardmarket
-  // (Singles o Sealed), no una imagen, un enlace de otra web, o la home de un set.
+  // (cualquier categoría: Singles, Box-Sets, Booster-Boxes, Boosters, Bundles...),
+  // no una imagen, un enlace de otra web, o la página de listado de una categoría/set.
+  // Ojo: exige el dominio exacto www.cardmarket.com / cardmarket.com — un subdominio
+  // como product-images.s3.cardmarket.com (enlace de imagen) NO cuenta como válido
+  // aunque termine en "cardmarket.com".
   // Devuelve null si es válido, o un texto explicando qué falla si no lo es.
   function validateCardmarketProductUrl(url) {
     let u;
     try { u = new URL(url); } catch (e) { return "it isn't a valid web link"; }
-    if (!/(^|\.)cardmarket\.com$/i.test(u.hostname)) return 'the link is not from cardmarket.com';
+    const host = u.hostname.toLowerCase();
+    if (host !== 'www.cardmarket.com' && host !== 'cardmarket.com') {
+      return 'the link is not a cardmarket.com product page (looks like a different site, or an image link such as product-images.s3.cardmarket.com)';
+    }
     const parts = u.pathname.split('/').filter(Boolean);
-    const idx = parts.findIndex(function (p) { return p === 'Singles' || p === 'Sealed'; });
-    if (idx === -1) return "it's not a product page (missing /Singles/ or /Sealed/ in the link — check you copied the card's page, not an image)";
-    if (idx === parts.length - 1) return 'the card/product name is missing after Singles/Sealed in the link';
+    const pIdx = parts.indexOf('Products');
+    if (pIdx === -1 || parts.length < pIdx + 3) {
+      return "it's not a full product page — make sure you copied the specific card/product link (with its name in the URL), not a category or set listing page";
+    }
     return null;
   }
 
@@ -673,10 +692,17 @@
     const rowsToInsert = lines.map(function (entry) {
       let normalizedUrl = normalizeCardmarketUrl(entry.url);
       const parsed = parseCardmarketUrl(normalizedUrl);
-      let conditionValue = parsed.condition || null;
-      if (conditionEl && !isSealedUrl(normalizedUrl)) {
+      let conditionValue;
+      if (isSealedUrl(normalizedUrl)) {
+        // Producto sellado (Box-Sets, Booster-Boxes, Boosters, Bundles...): la condición
+        // física NM/EX no aplica — se ignora el desplegable para esta línea concreta,
+        // aunque el pegado incluya también singles en otras líneas del mismo lote.
+        conditionValue = 'Sealed';
+      } else if (conditionEl) {
         conditionValue = conditionEl.value;
         normalizedUrl = applyConditionToUrl(normalizedUrl, conditionValue);
+      } else {
+        conditionValue = parsed.condition || null;
       }
       const price = (entry.inlinePrice != null) ? entry.inlinePrice : globalPrice;
       const fields = {
