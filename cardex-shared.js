@@ -606,6 +606,20 @@
   // como valor por defecto para esa línea. Si no falla nada, se hace UNA sola
   // petición a Supabase con un array de filas (PostgREST inserta varias filas
   // de golpe si el body es un array), en vez de una petición por carta.
+  // Valida que el enlace sea realmente una página de producto de Cardmarket
+  // (Singles o Sealed), no una imagen, un enlace de otra web, o la home de un set.
+  // Devuelve null si es válido, o un texto explicando qué falla si no lo es.
+  function validateCardmarketProductUrl(url) {
+    let u;
+    try { u = new URL(url); } catch (e) { return "it isn't a valid web link"; }
+    if (!/(^|\.)cardmarket\.com$/i.test(u.hostname)) return 'the link is not from cardmarket.com';
+    const parts = u.pathname.split('/').filter(Boolean);
+    const idx = parts.findIndex(function (p) { return p === 'Singles' || p === 'Sealed'; });
+    if (idx === -1) return "it's not a product page (missing /Singles/ or /Sealed/ in the link — check you copied the card's page, not an image)";
+    if (idx === parts.length - 1) return 'the card/product name is missing after Singles/Sealed in the link';
+    return null;
+  }
+
   function parseBulkUrlLines(raw) {
     return raw.split('\n').map(function (line) { return line.trim(); })
       .filter(function (line) { return line.length > 0; })
@@ -627,9 +641,14 @@
     const lines = parseBulkUrlLines(rawText);
     if (!lines.length) { errEl.textContent = 'Enter at least one Cardmarket link.'; errEl.style.display = 'block'; return; }
 
-    const invalidUrls = lines.filter(function (l) { return !/^https?:\/\//i.test(l.url); });
+    const invalidUrls = [];
+    lines.forEach(function (l) {
+      const reason = validateCardmarketProductUrl(l.url);
+      if (reason) invalidUrls.push({ raw: l.raw, reason: reason });
+    });
     if (invalidUrls.length) {
-      errEl.textContent = "This doesn't look like a valid link: \"" + invalidUrls[0].raw + '". Check each line and try again.';
+      errEl.textContent = (invalidUrls.length > 1 ? invalidUrls.length + ' links look wrong. First one: ' : 'This link looks wrong: ') +
+        '"' + invalidUrls[0].raw + '" — ' + invalidUrls[0].reason + '. Fix it and try again.';
       errEl.style.display = 'block';
       return;
     }
