@@ -247,8 +247,9 @@
   .cx-form-title{font-size:17px;font-weight:800;margin-bottom:14px;color:#f2f2f2;}
   .cx-form-row{margin-bottom:11px;display:flex;flex-direction:column;gap:4px;}
   .cx-form-row label{font-size:10.5px;text-transform:uppercase;letter-spacing:0.06em;color:#9a9a9a;font-weight:700;}
-  .cx-form-row input,.cx-form-row select{background:rgba(255,255,255,0.05);border:1px solid rgba(184,145,46,0.25);border-radius:7px;padding:8px 10px;color:#f2f2f2;font-size:13px;font-family:inherit;}
-  .cx-form-row input:focus,.cx-form-row select:focus{outline:none;border-color:#b8912e;}
+  .cx-form-row input,.cx-form-row select,.cx-form-row textarea{background:rgba(255,255,255,0.05);border:1px solid rgba(184,145,46,0.25);border-radius:7px;padding:8px 10px;color:#f2f2f2;font-size:13px;font-family:inherit;}
+  .cx-form-row textarea{resize:vertical;min-height:56px;line-height:1.4;}
+  .cx-form-row input:focus,.cx-form-row select:focus,.cx-form-row textarea:focus{outline:none;border-color:#b8912e;}
   .cx-form-row select option{background:#161616;color:#f2f2f2;}
   .cx-form-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   .cx-card-delete-x{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:rgba(10,10,10,0.85);border:1px solid rgba(255,255,255,0.15);color:#c9c9c9;font-size:12px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:5;transition:color 0.15s,border-color 0.15s,background 0.15s;}
@@ -571,11 +572,11 @@
           return '<div class="cx-status-tab' + (s === status ? ' active' : '') + '" data-status="' + s + '">' + statusLabel(s) + '</div>';
         }).join('') +
         '</div>' +
-        '<div class="cx-form-row"><label>Cardmarket link</label><input type="text" id="cx-f-url" placeholder="https://www.cardmarket.com/en/Riftbound/Products/..."/></div>' +
-        (showPrice ? '<div class="cx-form-row"><label>' + priceLabel + '</label><input type="number" step="0.01" id="cx-f-price"/></div>' : '') +
+        '<div class="cx-form-row"><label>Cardmarket link(s)</label><textarea id="cx-f-url" rows="3" placeholder="Paste one or several links, one per line.&#10;Optional: add a price at the end of a line, e.g. https://... 25.50"></textarea><div id="cx-f-url-count" style="font-size:11px;color:var(--text-muted);margin-top:3px;min-height:14px;"></div></div>' +
+        (showPrice ? '<div class="cx-form-row"><label>' + priceLabel + '</label><input type="number" step="0.01" id="cx-f-price"/><div style="font-size:11px;color:var(--text-muted);margin-top:3px;">Used for links without their own price. If you paste several links, add a price per line to set different prices.</div></div>' : '') +
         (showCondition ? '<div class="cx-form-row"><label>Condition</label><select id="cx-f-condition">' + conditionOptionsHtml('NM') + '</select></div>' : '') +
         (status === 'Watchlist' ? '<div class="cx-form-row"><label>Watchlist</label><select id="cx-f-watchlist">' + watchlistOptionsHtml(defaultWatchlistName()) + '</select></div>' : '') +
-        '<div style="font-size:11px;color:var(--text-muted);margin:2px 0 10px;line-height:1.4;">Card name and set are guessed from the link — you can refine them anytime from chat. The image fills in automatically later, no need to add it here.</div>' +
+        '<div style="font-size:11px;color:var(--text-muted);margin:2px 0 10px;line-height:1.4;">Card name and set are guessed from each link — you can refine them anytime from chat. The image fills in automatically later, no need to add it here. The condition selected above applies to all linked singles.</div>' +
         '<div class="cx-form-error" id="cx-form-error"></div>' +
         '<div class="cx-form-actions">' +
         '<button class="cx-btn cx-btn-ghost" id="cx-form-cancel">Cancel</button>' +
@@ -588,57 +589,106 @@
       wireWatchlistSelect('cx-f-watchlist');
       document.getElementById('cx-form-cancel').addEventListener('click', closeForm);
       document.getElementById('cx-form-save').addEventListener('click', function () { submitAdd(status); });
+      const urlEl = document.getElementById('cx-f-url');
+      const countEl = document.getElementById('cx-f-url-count');
+      function updateCount() {
+        const n = parseBulkUrlLines(urlEl.value.trim()).length;
+        countEl.textContent = n > 1 ? (n + ' links detected — they will be added in bulk.') : '';
+      }
+      urlEl.addEventListener('input', updateCount);
     }
     render();
   }
 
+  // Añadir cartas en bloque: el textarea acepta uno o varios enlaces de Cardmarket,
+  // uno por línea. Cada línea puede terminar opcionalmente en un precio
+  // ("https://... 25.50"); si no lo trae, se usa el campo de precio general
+  // como valor por defecto para esa línea. Si no falla nada, se hace UNA sola
+  // petición a Supabase con un array de filas (PostgREST inserta varias filas
+  // de golpe si el body es un array), en vez de una petición por carta.
+  function parseBulkUrlLines(raw) {
+    return raw.split('\n').map(function (line) { return line.trim(); })
+      .filter(function (line) { return line.length > 0; })
+      .map(function (line) {
+        const m = line.match(/^(\S+)\s+([\d.,]+)\s*$/);
+        if (m) {
+          const priceNum = Number(m[2].replace(',', '.'));
+          return { raw: line, url: m[1], inlinePrice: isNaN(priceNum) ? null : priceNum };
+        }
+        return { raw: line, url: line, inlinePrice: null };
+      });
+  }
+
   function submitAdd(status) {
     const errEl = document.getElementById('cx-form-error');
-    const url = document.getElementById('cx-f-url').value.trim();
-    if (!url) { errEl.textContent = 'The Cardmarket link is required.'; errEl.style.display = 'block'; return; }
+    errEl.style.display = 'none';
+    const rawText = document.getElementById('cx-f-url').value.trim();
+    if (!rawText) { errEl.textContent = 'Enter at least one Cardmarket link.'; errEl.style.display = 'block'; return; }
+    const lines = parseBulkUrlLines(rawText);
+    if (!lines.length) { errEl.textContent = 'Enter at least one Cardmarket link.'; errEl.style.display = 'block'; return; }
+
+    const invalidUrls = lines.filter(function (l) { return !/^https?:\/\//i.test(l.url); });
+    if (invalidUrls.length) {
+      errEl.textContent = "This doesn't look like a valid link: \"" + invalidUrls[0].raw + '". Check each line and try again.';
+      errEl.style.display = 'block';
+      return;
+    }
+
     const priceEl = document.getElementById('cx-f-price');
-    let price = null;
-    if (priceEl) {
-      if (!priceEl.value) { errEl.textContent = 'Enter the price.'; errEl.style.display = 'block'; return; }
-      price = Number(priceEl.value);
-    }
-    let normalizedUrl = normalizeCardmarketUrl(url);
-    const parsed = parseCardmarketUrl(normalizedUrl);
+    const globalPrice = (priceEl && priceEl.value) ? Number(priceEl.value) : null;
+    const priceRequired = status !== 'Watchlist';
     const conditionEl = document.getElementById('cx-f-condition');
-    let conditionValue = parsed.condition || null;
-    if (conditionEl && !isSealedUrl(normalizedUrl)) {
-      conditionValue = conditionEl.value;
-      normalizedUrl = applyConditionToUrl(normalizedUrl, conditionValue);
-    }
+    const wlEl = document.getElementById('cx-f-watchlist');
+    const watchlistName = (wlEl && wlEl.value && wlEl.value !== '__new__') ? wlEl.value : 'General';
     const today = new Date().toISOString().slice(0, 10);
-    const fields = {
-      card_name: parsed.name || 'Unnamed card (please update)',
-      set: parsed.set || null,
-      condition: conditionValue,
-      cardmarket_url: normalizedUrl,
-      card_image: null,
-      status: status,
-      current_price: price
-    };
-    if (status === 'Holding') {
-      fields.buy_price = price;
-      fields.buy_date = today;
+
+    if (priceRequired) {
+      const missing = lines.filter(function (l) { return l.inlinePrice == null && (globalPrice == null || isNaN(globalPrice)); });
+      if (missing.length) {
+        errEl.textContent = missing.length + ' link(s) have no price. Add it at the end of each line, or fill in the price field above to apply it to all of them.';
+        errEl.style.display = 'block';
+        return;
+      }
     }
-    if (status === 'Sold') {
-      fields.sell_price = price;
-      fields.sell_date = today;
+
+    const rowsToInsert = lines.map(function (entry) {
+      let normalizedUrl = normalizeCardmarketUrl(entry.url);
+      const parsed = parseCardmarketUrl(normalizedUrl);
+      let conditionValue = parsed.condition || null;
+      if (conditionEl && !isSealedUrl(normalizedUrl)) {
+        conditionValue = conditionEl.value;
+        normalizedUrl = applyConditionToUrl(normalizedUrl, conditionValue);
+      }
+      const price = (entry.inlinePrice != null) ? entry.inlinePrice : globalPrice;
+      const fields = {
+        card_name: parsed.name || 'Unnamed card (please update)',
+        set: parsed.set || null,
+        condition: conditionValue,
+        cardmarket_url: normalizedUrl,
+        card_image: null,
+        status: status,
+        current_price: price
+      };
+      if (status === 'Holding') { fields.buy_price = price; fields.buy_date = today; }
+      if (status === 'Sold') { fields.sell_price = price; fields.sell_date = today; }
+      if (status === 'Watchlist') { fields.watchlist_name = watchlistName; }
+      return fields;
+    });
+
+    const saveBtn = document.getElementById('cx-form-save');
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.textContent = rowsToInsert.length > 1 ? ('Saving ' + rowsToInsert.length + ' cards...') : 'Saving...';
     }
-    if (status === 'Watchlist') {
-      const wlEl = document.getElementById('cx-f-watchlist');
-      fields.watchlist_name = (wlEl && wlEl.value && wlEl.value !== '__new__') ? wlEl.value : 'General';
-    }
-    insertCard(fields).then(function () {
+
+    insertCard(rowsToInsert).then(function () {
       closeForm();
       return window.CardexReload();
     }).then(function () {
       if (typeof window.CardexOnDataChange === 'function') window.CardexOnDataChange();
       else window.location.reload();
     }).catch(function (err) {
+      if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save'; }
       errEl.textContent = 'Error saving: ' + err.message;
       errEl.style.display = 'block';
     });
