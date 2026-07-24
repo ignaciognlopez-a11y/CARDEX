@@ -29,7 +29,7 @@
       rarity: row.rarity,
       condition: row.condition,
       status: row.status,
-      qty: 1,
+      qty: row.quantity != null ? Number(row.quantity) : 1,
       buyPrice: row.buy_price === null ? 0 : Number(row.buy_price),
       currentPrice: row.current_price === null ? 0 : Number(row.current_price),
       image: row.card_image || "",
@@ -474,17 +474,18 @@
     const isSealed = item.cardmarketUrl ? isSealedUrl(item.cardmarketUrl) : (item.condition === 'Sealed');
     const conditionRow = (!isSealed) ?
       '<div class="cx-form-row"><label>Condition</label><select id="cx-f-condition">' + conditionOptionsHtml(CONDITION_OPTIONS.indexOf(item.condition) !== -1 ? item.condition : 'NM') + '</select></div>' : '';
+    const qtyRow = '<div class="cx-form-row"><label>Quantity</label><input type="number" step="1" min="1" id="cx-f-qty" value="' + (item.qty != null ? item.qty : 1) + '"/></div>';
     if (status === 'Holding') {
       return '<div class="cx-form-grid2">' +
-        '<div class="cx-form-row"><label>Buy Price (€)</label><input type="number" step="0.01" id="cx-f-buyPrice" value="' + (item.buyPrice != null ? item.buyPrice : '') + '"/></div>' +
+        '<div class="cx-form-row"><label>Buy Price (€ / unit)</label><input type="number" step="0.01" id="cx-f-buyPrice" value="' + (item.buyPrice != null ? item.buyPrice : '') + '"/></div>' +
         '<div class="cx-form-row"><label>Buy Date</label><input type="date" id="cx-f-buyDate" value="' + (item.buyDate || '') + '"/></div>' +
-        '</div>' + conditionRow;
+        '</div>' + qtyRow + conditionRow;
     }
     if (status === 'Sold') {
       return '<div class="cx-form-grid2">' +
-        '<div class="cx-form-row"><label>Sell Price (€)</label><input type="number" step="0.01" id="cx-f-sellPrice" value="' + (item.sellPrice != null ? item.sellPrice : '') + '"/></div>' +
+        '<div class="cx-form-row"><label>Sell Price (€ / unit)</label><input type="number" step="0.01" id="cx-f-sellPrice" value="' + (item.sellPrice != null ? item.sellPrice : '') + '"/></div>' +
         '<div class="cx-form-row"><label>Sell Date</label><input type="date" id="cx-f-sellDate" value="' + (item.sellDate || '') + '"/></div>' +
-        '</div>' + conditionRow;
+        '</div>' + qtyRow + conditionRow;
     }
     if (status === 'Watchlist') {
       return '<div class="cx-form-row"><label>Watchlist</label><select id="cx-f-watchlist">' + watchlistOptionsHtml(item.watchlistName || 'General') + '</select></div>' + conditionRow;
@@ -584,7 +585,12 @@
         }).join('') +
         '</div>' +
         '<div class="cx-form-row"><label>Cardmarket link(s)</label><textarea id="cx-f-url" rows="3" placeholder="Paste one or several links, one per line.&#10;Optional: add a price at the end of a line, e.g. https://... 25.50"></textarea><div id="cx-f-url-count" style="font-size:11px;color:var(--text-muted);margin-top:3px;min-height:14px;"></div></div>' +
-        (showPrice ? '<div class="cx-form-row"><label>' + priceLabel + '</label><input type="number" step="0.01" id="cx-f-price"/><div style="font-size:11px;color:var(--text-muted);margin-top:3px;">Used for links without their own price. If you paste several links, add a price per line to set different prices.</div></div>' : '') +
+        (showPrice ? '<div class="cx-form-grid2">' +
+          '<div class="cx-form-row"><label>' + priceLabel + '</label><input type="number" step="0.01" id="cx-f-price"/></div>' +
+          '<div class="cx-form-row"><label>Quantity</label><input type="number" step="1" min="1" id="cx-f-qty" value="1"/></div>' +
+          '</div>' +
+          '<div style="font-size:11px;color:var(--text-muted);margin:-6px 0 8px;line-height:1.4;">Enter the TOTAL you paid/received for that quantity (not per-unit) — e.g. 16 units for 311€ total. Used for links without their own price; if you paste several links, this quantity and price apply to each of them.</div>'
+          : '') +
         (showCondition ? '<div class="cx-form-row"><label>Condition</label><select id="cx-f-condition">' + conditionOptionsHtml('NM') + '</select></div>' : '') +
         (status === 'Watchlist' ? '<div class="cx-form-row"><label>Watchlist</label><select id="cx-f-watchlist">' + watchlistOptionsHtml(defaultWatchlistName()) + '</select></div>' : '') +
         '<div style="font-size:11px;color:var(--text-muted);margin:2px 0 10px;line-height:1.4;">Card name and set are guessed from each link — you can refine them anytime from chat. The image fills in automatically later, no need to add it here. The condition selected above applies to all linked singles.</div>' +
@@ -680,6 +686,10 @@
     const watchlistName = (wlEl && wlEl.value && wlEl.value !== '__new__') ? wlEl.value : 'General';
     const today = new Date().toISOString().slice(0, 10);
 
+    const qtyEl = document.getElementById('cx-f-qty');
+    let qty = qtyEl ? parseInt(qtyEl.value, 10) : 1;
+    if (!qty || qty < 1) qty = 1;
+
     if (priceRequired) {
       const missing = lines.filter(function (l) { return l.inlinePrice == null && (globalPrice == null || isNaN(globalPrice)); });
       if (missing.length) {
@@ -704,7 +714,13 @@
       } else {
         conditionValue = parsed.condition || null;
       }
-      const price = (entry.inlinePrice != null) ? entry.inlinePrice : globalPrice;
+      // El precio que se escribe en el formulario es el TOTAL pagado/cobrado por esa
+      // cantidad (más natural para el humano: "16 kits por 311€"). Pero en toda la web
+      // (holding/index/invested/sales.html) buy_price, sell_price y current_price se
+      // tratan como precio POR UNIDAD, multiplicando por qty para sacar el total — así
+      // que aquí se divide entre la cantidad antes de guardar, para que ambos mundos cuadren.
+      const totalPrice = (entry.inlinePrice != null) ? entry.inlinePrice : globalPrice;
+      const unitPrice = (totalPrice != null && !isNaN(totalPrice)) ? totalPrice / qty : null;
       const fields = {
         card_name: parsed.name || 'Unnamed card (please update)',
         set: parsed.set || null,
@@ -712,10 +728,11 @@
         cardmarket_url: normalizedUrl,
         card_image: null,
         status: status,
-        current_price: price
+        quantity: qty,
+        current_price: unitPrice
       };
-      if (status === 'Holding') { fields.buy_price = price; fields.buy_date = today; }
-      if (status === 'Sold') { fields.sell_price = price; fields.sell_date = today; }
+      if (status === 'Holding') { fields.buy_price = unitPrice; fields.buy_date = today; }
+      if (status === 'Sold') { fields.sell_price = unitPrice; fields.sell_date = today; }
       if (status === 'Watchlist') { fields.watchlist_name = watchlistName; }
       return fields;
     });
@@ -771,6 +788,12 @@
   function submitMove(item, targetStatus) {
     const errEl = document.getElementById('cx-form-error');
     const patch = { status: targetStatus };
+    const qtyEl = document.getElementById('cx-f-qty');
+    if (qtyEl) {
+      let q = parseInt(qtyEl.value, 10);
+      if (!q || q < 1) q = 1;
+      patch.quantity = q;
+    }
     if (targetStatus === 'Holding') {
       const bp = document.getElementById('cx-f-buyPrice'), bd = document.getElementById('cx-f-buyDate');
       if (bp) patch.buy_price = bp.value ? Number(bp.value) : 0;

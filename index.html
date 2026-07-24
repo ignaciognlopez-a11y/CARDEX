@@ -973,7 +973,7 @@
     holding.forEach(c => {
       const key = c.set || 'No set';
       if (!bySet[key]) bySet[key] = { qty: 0, value: 0 };
-      bySet[key].qty += 1;
+      bySet[key].qty += (c.qty || 1);
       bySet[key].value += c.currentPrice * (c.qty||1);
     });
     const setEntries = Object.entries(bySet).sort((a,b)=>b[1].value-a[1].value);
